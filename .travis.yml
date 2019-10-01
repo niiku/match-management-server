@@ -1,0 +1,35 @@
+language: java
+jdk:
+  - openjdk8
+services:
+  - docker
+
+env:
+  global:
+   - secure: "iBWgojeFoD1tNUICWWC0ndOKAYcgyfNXbD9qcV/a0zMYHokg/P7FBqI753wgeW1PkNYymY1bqzY/1wtGYpzqrPhJpoiRVx7COasYKWfpYC1D2PPzVRKCmM1XgUr8ujtSk1+l+k5d7tOPspsrtA+6aQ5nFkEUqQHzGETcpv71dW9Nh30W78KFkk/4tQNQ/xulLQxXW5kQNbHAMvJbS91vGGGReuCV0YP7I8lThF/vC6d03jFkbHYL/F32yMQia0UczfPCJ2+QqvRyfDTn7bFuBadgnw+Hqpp0WtIzB0Es9nMTYg82U1R5z+1SRwE1yyB3CJ+iSRi48459IR6xxOnfdbAeHiLm2PPgcc85ixUvSXiQYqbvrPEcDnIyVqI3eci8U+5Tu4xQTVll9nvUwJp8Djleyadwy4RcpACzXIpmL59gbPA85d1kIYv/74hqdL/T9PXpj2MHePxBjn8vWY1rPT7+9fm1/uCruWHh2+kSo6Q+N0vJ2uE43vHGyk6i2i+X1WEPyqWEGziDOJHmj1WWQGELqGHMa40o9t3FshuufUzhHjEUyHC2ATxHGzZR3Ptxu4Mq1wUXCJH4bV8JrLsIg6vonp1GC/QL1bSSCWYw9Yq9AS0jNQ9Z3yFm05cSm0mQBQc1UtCZrIqEWQLTIFbEa6Adm8NHFELx3X29AiWD3GE="
+   - secure: "BsJDDd8av323+v2dRsCx3yURw1AVuxpJKofXWVmQZpGtBe5A7nXMRseMdV/Z9uIsoVDb97Jl/gkA+X8h2znI0qCyIxtEYBkpJlu5VZUp0JdhTMLuSULVg1+9ZE36ePqJgOPjR8ROl22aoXIE5Pf993222zbmH4xTXsQ3dpmsMf2TjxiYZpR7EqZIMrcm8Hczni27gFWa6v/c1Pvb17wxCT644pgMUW8ahKm07mJQaih1MHOBO2mXSsHpPxhY9YxCx6Ye1zxs6n9AHE/ASXmCI6P/WSBQPDzKLWvNMGA9k897pNekoGF8oFAWVqRjA2uoh2a8Smu/xB+7/wPCldaHXXV5Vq0PWzhq/3AjH15n2ZOA6NvVa7J8aKnvBDrLnTVHc7AhGQLnT/SvtEXJCgP3nMiZOHzf4GmVoU5BxU87cKMTUgyZAkQie91mmigZYWwiqeysW3grsOqj5Th+dwiAh4L3IaO7pelvK2xmDlhWzWj/FP/QPw5ZE+HWzaDA5bplvSotFQ7m9hVbCpZjE4CjXg4KI6b1XIGa2Qu/i5DuylecMqu7jJirjDHjV8lkpmxAdEsrAi+b+y10PlKZ5R4hu7x9ZUrQSZ4mm6UWUydzKtnz+5JtjOXRgD1WY03+G4QEA9BWsQF5ofzfwJs7+J3eURns+Qrk5gfXQMPm5zTHY/U="
+   - COMMIT=${TRAVIS_COMMIT::7}
+
+before_install:
+  - chmod +x mvnw
+  - docker pull openjdk:8-jdk-alpine
+
+script:
+  - ./mvnw clean install -B
+
+after_success:
+  - export COMMIT=${TRAVIS_COMMIT::7}
+  - export TAG=`if [ ! -z "$TRAVIS_TAG" ]; then echo "$TRAVIS_TAG"; else echo "$TRAVIS_BRANCH-$COMMIT"; fi`
+  - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+  - docker build . -t $IMAGE_NAME:latest
+  - docker tag $IMAGE_NAME:latest $IMAGE_NAME:$TAG
+  - docker push $IMAGE_NAME:latest
+  - docker push $IMAGE_NAME:$TAG
+  - export TITLE="$IMAGE_NAME:$TAG is built properly and pushed to Dockerhub"
+  - export TIMESTAMP=`date`
+  - export GIT_LOG=`git log -1 --pretty=%B $COMMIT`
+  - export TEXT="[build version] $TAG<br />[datetime] $TIMESTAMP<br />[changelog] $GIT_LOG<br />"
+
+cache:
+  directories:
+    - '$HOME/.m2/repository'
