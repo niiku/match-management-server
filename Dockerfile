@@ -1,11 +1,6 @@
 FROM openjdk:8-jre-alpine
-
-ENV APP_ROOT /app
-
-RUN mkdir ${APP_ROOT}
-
-WORKDIR ${APP_ROOT}
-
-COPY target/*.jar ${APP_ROOT}/run.jar
-
-ENTRYPOINT ["java", "-jar", "run.jar"]
+RUN mkdir /opt/app/
+ADD target/libs/*.jar /opt/app/app.jar
+ADD entrypoint.sh /opt/app/entrypoint.sh
+EXPOSE 8080
+ENTRYPOINT ["sh", "/opt/app/entrypoint.sh"]
