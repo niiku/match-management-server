@@ -7,14 +7,17 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="server" />
+        <module name="match-management-server" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="match-management-server" target="1.8" />
       <module name="server" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="match-management-server" options="-parameters" />
       <module name="server" options="-parameters" />
     </option>
   </component>
