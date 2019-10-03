@@ -20,26 +20,15 @@ before_install:
   - chmod +x mvnw
   - docker pull openjdk:8-jdk-alpine
 
-
-jobs:
-  include:
-    - stage: Maven Build
-      script:
-        - ./mvnw clean install -B
-    - stage: Docker Build & Tag
-      script:
-        - export TAG=$(if [ ! -z "$TRAVIS_TAG" ]; then echo "$TRAVIS_TAG"; else echo "$TRAVIS_BRANCH-$COMMIT"; fi | sed 's/\//-/')
-        - docker build . -t $IMAGE_NAME:latest
-        - docker tag $IMAGE_NAME:latest $IMAGE_NAME:$TAG
-    - stage: Docker Push
-      script: 
-        - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-        - docker push $IMAGE_NAME:latest
-        - docker push $IMAGE_NAME:$TAG
-    - stage: GitOps Deploy
-      script:
-        - docker run -e APP_NAME=$APP_NAME -e CONFIG_REPOSITORY=$CONFIG_REPOSITORY -e YAML_PATH="app.backend.image.tag" -e NEW_VALUE=$TAG tabletennistournament/gitops-deploy
-
+script:
+  - ./mvnw clean install -B
+  - export TAG=$(if [ ! -z "$TRAVIS_TAG" ]; then echo "$TRAVIS_TAG"; else echo "$TRAVIS_BRANCH-$COMMIT"; fi | sed 's/\//-/')
+  - docker build . -t $IMAGE_NAME:latest
+  - docker tag $IMAGE_NAME:latest $IMAGE_NAME:$TAG
+  - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+  - docker push $IMAGE_NAME:latest
+  - docker push $IMAGE_NAME:$TAG
+  - docker run -e APP_NAME=$APP_NAME -e CONFIG_REPOSITORY=$CONFIG_REPOSITORY -e YAML_PATH="app.backend.image.tag" -e NEW_VALUE=$TAG tabletennistournament/gitops-deploy
 
 cache:
   directories:
