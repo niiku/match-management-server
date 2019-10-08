@@ -1,4 +1,4 @@
-package com.match.management.domain;
+package com.match.management.domain.match;
 
 import lombok.Value;
 
