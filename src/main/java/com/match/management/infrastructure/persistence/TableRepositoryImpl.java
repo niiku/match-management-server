@@ -18,6 +18,11 @@ public class TableRepositoryImpl implements TableRepository {
     private final Table tableDummy3 = new Table(new TableId("3"), new TableManagerId(1), new MatchId(3));
 
     @Override
+    public List<Table> getTables() {
+        return Arrays.asList(tableDummy1, tableDummy2, tableDummy3);
+    }
+
+    @Override
     public List<Table> findTablesByTableManager(TableManagerId tableManagerId) {
         return Arrays.asList(tableDummy1, tableDummy2, tableDummy3);
     }

@@ -24,8 +24,13 @@ public class TableResource {
     MatchRepository matchRepository;
 
     @GetMapping()
-    public List<TableDTO> getTables(@RequestParam(name = "table_manager", required = false) int tableManagerId) {
-        List<Table> tables = tableRepository.findTablesByTableManager(new TableManagerId(tableManagerId));
+    public List<TableDTO> getTables(@RequestParam(name = "table_manager", required = false) Integer tableManagerId) {
+        List<Table> tables;
+        if(tableManagerId == null) {
+            tables = tableRepository.getTables();
+        } else {
+            tables = tableRepository.findTablesByTableManager(new TableManagerId(tableManagerId.intValue()));
+        }
         List<TableDTO> result = new ArrayList<>();
         for (Table table : tables) {
             Match currentMatch = matchRepository.findById(table.getActiveMatch());
