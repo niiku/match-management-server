@@ -9,6 +9,6 @@ import lombok.Data;
 @Builder
 public class TableDTO {
     private final String tableId;
-    private final String tableManagerId;
+    private final int tableManagerId;
     private final MatchDTO currentMatch;
 }

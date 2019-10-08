@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 @Builder
 public class MatchDTO {
-    private final String matchId;
+    private final long matchId;
     private final String classification;
     private final PlayerDTO playerA;
     private final PlayerDTO playerB;
