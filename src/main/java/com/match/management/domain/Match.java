@@ -1,19 +1,22 @@
 package com.match.management.domain;
 
+import com.match.management.domain.ddd.Aggregate;
+import com.match.management.domain.ddd.AggregateId;
 import lombok.Data;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
+@Aggregate
 public class Match {
 
-    private long id;
-    private String classification;
+    @AggregateId
+    private MatchId id;
+
+    private Classification classification;
     private Player playerA;
     private Player playerB;
-    private List<Pair<Integer,Integer>> matchSets;
+    private Result matchSets;
     private LocalDateTime start;
     private LocalDateTime end;
 

@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class Player {
 
-    private long id;
+    private PlayerId id;
     private String firstName;
     private String lastName;
-    private String clubName;
+    private Club clubName;
 
 }
