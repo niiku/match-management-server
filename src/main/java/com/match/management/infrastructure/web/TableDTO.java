@@ -13,13 +13,13 @@ import java.util.function.Function;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TableDTO {
     private String tableId;
-    private int tableManagerId;
+    private Integer tableManagerId;
     private MatchDTO currentMatch;
 
     public static TableDTO from(Table table, Function<MatchId, Match> matchResolver) {
         return TableDTO.builder()
                 .tableId(table.getId().getValue())
-                .tableManagerId(table.getTableManagerId().getValue())
+                .tableManagerId(table.getTableManagerId() == null ? null : table.getTableManagerId().getValue())
                 .currentMatch(MatchDTO.from(matchResolver.apply(table.getActiveMatch())))
                 .build();
     }
