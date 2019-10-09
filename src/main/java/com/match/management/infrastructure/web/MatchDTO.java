@@ -1,7 +1,6 @@
 package com.match.management.infrastructure.web;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.match.management.domain.match.Match;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,4 +12,14 @@ public class MatchDTO {
     private final PlayerDTO playerA;
     private final PlayerDTO playerB;
     private final ResultDTO result;
+
+    public static MatchDTO from(Match match) {
+        return MatchDTO.builder()
+                .matchId(match.getId().getValue())
+                .classification(match.getClassification().getValue())
+                .playerA(PlayerDTO.from(match.getPlayerA()))
+                .playerB(PlayerDTO.from(match.getPlayerB()))
+                .result(new ResultDTO())
+                .build();
+    }
 }
