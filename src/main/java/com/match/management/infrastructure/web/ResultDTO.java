@@ -1,5 +1,7 @@
 package com.match.management.infrastructure.web;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy.SnakeCaseStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.match.management.domain.match.Result;
 import lombok.*;
 import org.apache.commons.lang3.tuple.Pair;
@@ -10,6 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@JsonNaming(SnakeCaseStrategy.class)
 public class ResultDTO {
     private List<Pair<Integer, Integer>> games;
 
