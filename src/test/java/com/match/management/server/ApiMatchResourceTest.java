@@ -1,5 +1,6 @@
 package com.match.management.server;
 
+import com.match.management.domain.EventRepository;
 import com.match.management.domain.match.GameResult;
 import com.match.management.domain.match.MatchId;
 import com.match.management.domain.match.MatchRepository;
@@ -13,8 +14,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import static java.util.Collections.singletonList;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,6 +32,9 @@ public class ApiMatchResourceTest {
 
     @Autowired
     private MatchRepository matchRepository;
+
+    @Autowired
+    private EventRepository eventRepository;
 
     @Test
     public void getMatch_HappyFlow() throws Exception {
@@ -47,6 +53,8 @@ public class ApiMatchResourceTest {
 
     @Test
     public void updateResult_happy_flow() throws Exception {
+        AtomicReference<Object> catchEvents = new AtomicReference<>();
+        eventRepository.subscribe(event -> catchEvents.set(event));
         Result result = new Result(singletonList(new GameResult(7, 11)));
         // TODO: create json programmatically
         mvc.perform(put("/matches/0/result")
@@ -55,5 +63,6 @@ public class ApiMatchResourceTest {
                 .andExpect(status().isOk());
         assertThat(matchRepository.findById(new MatchId(0)).getMatchSets())
                 .isEqualTo(result);
+        assertThat(catchEvents.get()).isNotNull();
     }
 }
