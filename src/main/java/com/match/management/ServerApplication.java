@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import java.util.Collections;
+
 @SpringBootApplication
 @EnableScheduling
 public class ServerApplication {
@@ -61,7 +63,9 @@ public class ServerApplication {
                                         .lastName("Meier" + i)
                                         .club("TSV Zürich")
                                         .build())
-                                .result(ResultDTO.builder().build())
+                                .result(ResultDTO.builder()
+                                        .games(Collections.emptyList())
+                                        .build())
                                 .build())
                         .build())
                 .build());
