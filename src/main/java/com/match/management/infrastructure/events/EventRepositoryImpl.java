@@ -9,12 +9,10 @@ import java.util.List;
 
 @Component
 public class EventRepositoryImpl implements EventRepository {
-    private List<Object> events = new ArrayList<>();
     private List<EventListener> listeners = new ArrayList<>();
 
     @Override
     public void publishEvent(Object event) {
-        events.add(event);
         listeners.forEach(l -> l.eventOcurred(event));
     }
 
@@ -23,8 +21,4 @@ public class EventRepositoryImpl implements EventRepository {
         listeners.add(eventListener);
     }
 
-    @Override
-    public List<Object> getAllEvents() {
-        return events;
-    }
 }

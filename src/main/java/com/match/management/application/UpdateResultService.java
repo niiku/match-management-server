@@ -25,7 +25,7 @@ public class UpdateResultService {
         match.updateResult(result);
 
         // TODO publish event
-        eventRepository.publishEvent(new Object());
+        eventRepository.publishEvent(matchId);
     }
 
 }

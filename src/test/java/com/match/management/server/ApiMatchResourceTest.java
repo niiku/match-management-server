@@ -14,6 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -51,6 +53,8 @@ public class ApiMatchResourceTest {
 
     @Test
     public void updateResult_happy_flow() throws Exception {
+        AtomicReference<Object> catchEvents = new AtomicReference<>();
+        eventRepository.subscribe(event -> catchEvents.set(event));
         Result result = new Result(singletonList(new GameResult(7, 11)));
         // TODO: create json programmatically
         mvc.perform(put("/matches/0/result")
@@ -59,6 +63,6 @@ public class ApiMatchResourceTest {
                 .andExpect(status().isOk());
         assertThat(matchRepository.findById(new MatchId(0)).getMatchSets())
                 .isEqualTo(result);
-        assertThat(eventRepository.getAllEvents()).hasSize(1);
+        assertThat(catchEvents.get()).isNotNull();
     }
 }
