@@ -1,5 +1,7 @@
 package com.match.management.infrastructure.web;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy.SnakeCaseStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.match.management.domain.match.Match;
 import com.match.management.domain.match.MatchId;
 import com.match.management.domain.table.Table;
@@ -11,6 +13,7 @@ import java.util.function.Function;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@JsonNaming(SnakeCaseStrategy.class)
 public class TableDTO {
     private String tableId;
     private Integer tableManagerId;

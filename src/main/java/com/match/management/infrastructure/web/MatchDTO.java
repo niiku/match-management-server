@@ -1,5 +1,7 @@
 package com.match.management.infrastructure.web;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy.SnakeCaseStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.match.management.domain.match.Classification;
 import com.match.management.domain.match.Match;
 import com.match.management.domain.match.MatchId;
@@ -9,6 +11,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@JsonNaming(SnakeCaseStrategy.class)
 public class MatchDTO {
     
     private long matchId;
