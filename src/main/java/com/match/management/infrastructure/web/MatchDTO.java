@@ -1,17 +1,21 @@
 package com.match.management.infrastructure.web;
 
+import com.match.management.domain.match.Classification;
 import com.match.management.domain.match.Match;
-import lombok.Builder;
-import lombok.Data;
+import com.match.management.domain.match.MatchId;
+import lombok.*;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MatchDTO {
-    private final long matchId;
-    private final String classification;
-    private final PlayerDTO playerA;
-    private final PlayerDTO playerB;
-    private final ResultDTO result;
+    
+    private long matchId;
+    private String classification;
+    private PlayerDTO playerA;
+    private PlayerDTO playerB;
+    private ResultDTO result;
 
     public static MatchDTO from(Match match) {
         return MatchDTO.builder()
@@ -19,7 +23,19 @@ public class MatchDTO {
                 .classification(match.getClassification().getValue())
                 .playerA(PlayerDTO.from(match.getPlayerA()))
                 .playerB(PlayerDTO.from(match.getPlayerB()))
-                .result(new ResultDTO())
+                .result(ResultDTO.from(match.getMatchSets()))
                 .build();
+    }
+
+    public static Match to(MatchDTO match) {
+        return new Match(
+                new MatchId(match.getMatchId()),
+                new Classification(match.getClassification()),
+                PlayerDTO.to(match.getPlayerA()),
+                PlayerDTO.to(match.getPlayerB()),
+                ResultDTO.to(match.getResult()),
+                null,
+                null
+        );
     }
 }
