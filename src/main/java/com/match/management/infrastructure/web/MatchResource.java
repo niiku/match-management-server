@@ -1,5 +1,6 @@
 package com.match.management.infrastructure.web;
 
+import com.match.management.application.UpdateResultService;
 import com.match.management.domain.match.Match;
 import com.match.management.domain.match.MatchId;
 import com.match.management.domain.match.MatchRepository;
@@ -16,10 +17,13 @@ public class MatchResource {
     @Autowired
     MatchRepository matchRepository;
 
+    @Autowired
+    UpdateResultService updateResultService;
+
     @PutMapping(path = "{match_id}/result", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void updateResult(@PathVariable(name = "match_id") long matchId, @RequestBody ResultDTO result) {
         Match match = findMatch(matchId);
-        match.updateResult(ResultDTO.to(result));
+        updateResultService.updateResult(match.getId(), ResultDTO.to(result));
     }
 
     private Match findMatch(@PathVariable(name = "match_id") long matchId) {

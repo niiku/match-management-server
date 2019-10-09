@@ -23,9 +23,7 @@ public class Match {
     private LocalDateTime end;
 
     public void updateResult(Result result) {
-        // TODO validate
         this.matchSets = result;
-        // TODO publish event
     }
 
 }

@@ -1,5 +1,6 @@
 package com.match.management.server;
 
+import com.match.management.domain.EventRepository;
 import com.match.management.domain.match.GameResult;
 import com.match.management.domain.match.MatchId;
 import com.match.management.domain.match.MatchRepository;
@@ -14,7 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static java.util.Collections.singletonList;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,6 +30,9 @@ public class ApiMatchResourceTest {
 
     @Autowired
     private MatchRepository matchRepository;
+
+    @Autowired
+    private EventRepository eventRepository;
 
     @Test
     public void getMatch_HappyFlow() throws Exception {
@@ -55,5 +59,6 @@ public class ApiMatchResourceTest {
                 .andExpect(status().isOk());
         assertThat(matchRepository.findById(new MatchId(0)).getMatchSets())
                 .isEqualTo(result);
+        assertThat(eventRepository.getAllEvents()).hasSize(1);
     }
 }
