@@ -2,6 +2,7 @@ package com.match.management.infrastructure.web;
 
 import com.match.management.domain.*;
 import com.match.management.domain.match.MatchId;
+import com.match.management.domain.match.MatchRepository;
 import com.match.management.domain.table.TableId;
 import com.match.management.domain.table.TableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class TableWebSocketController {
     @Autowired
     private TableRepository tableRepository;
 
+    @Autowired
+    private MatchRepository matchRepository;
+
     @PostConstruct
     public void setup() {
         eventRepository.subscribe(event -> {
@@ -38,7 +42,10 @@ public class TableWebSocketController {
     }
 
     private void tableUpdate(TableId tableId) {
-        template.convertAndSend("/topic/table", tableRepository.findTable(tableId));
+        template.convertAndSend(
+                "/topic/table",
+                TableDTO.from(tableRepository.findTable(tableId), matchId -> matchRepository.findById(matchId))
+        );
     }
 
 }
