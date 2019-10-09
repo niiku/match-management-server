@@ -54,7 +54,7 @@ public class ApiMatchResourceTest {
     @Test
     public void updateResult_happy_flow() throws Exception {
         AtomicReference<Object> catchEvents = new AtomicReference<>();
-        eventRepository.subscribe(event -> catchEvents.set(event));
+        eventRepository.subscribe(catchEvents::set);
         Result result = new Result(singletonList(new GameResult(7, 11)));
         // TODO: create json programmatically
         mvc.perform(put("/matches/0/result")
