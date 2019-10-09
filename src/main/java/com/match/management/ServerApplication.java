@@ -52,8 +52,8 @@ public class ServerApplication {
     @EventListener
     public void initRepositoriesWithMockData(ApplicationStartedEvent event) {
         for(int i = 0; i < 15; i++) {
-            mockingResource.postEvent(EventDTO.builder()
-                .id(EventId.MATCH_ASSIGNED_TO_TABLE)
+            mockingResource.postEvent(ExternalEventDTO.builder()
+                .id(ExternalEventId.MATCH_ASSIGNED_TO_TABLE)
                 .payload(EventPayloadDTO.builder()
                         .tableId(String.valueOf(i))
                         .match(MatchDTO.builder()

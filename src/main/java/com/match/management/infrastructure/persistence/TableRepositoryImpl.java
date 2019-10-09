@@ -1,5 +1,6 @@
 package com.match.management.infrastructure.persistence;
 
+import com.match.management.domain.match.MatchId;
 import com.match.management.domain.table.Table;
 import com.match.management.domain.table.TableId;
 import com.match.management.domain.table.TableManagerId;
@@ -28,10 +29,18 @@ public class TableRepositoryImpl implements TableRepository {
     }
 
     @Override
-    public List<Table> findTablesByTableManager(TableManagerId tableManagerId) {
+    public List<Table> findTables(TableManagerId tableManagerId) {
         return getTables().stream()
                 .filter(t -> t.getTableManagerId().equals(tableManagerId))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Table findTable(MatchId matchId) {
+        return getTables().stream()
+                .filter(t -> t.getActiveMatch().equals(matchId))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.match.management.infrastructure.events;
 
+import com.match.management.domain.Event;
 import com.match.management.domain.EventListener;
 import com.match.management.domain.EventRepository;
 import org.springframework.stereotype.Component;
@@ -12,7 +13,7 @@ public class EventRepositoryImpl implements EventRepository {
     private List<EventListener> listeners = new ArrayList<>();
 
     @Override
-    public void publishEvent(Object event) {
+    public void publishEvent(Event event) {
         listeners.forEach(l -> l.eventOcurred(event));
     }
 

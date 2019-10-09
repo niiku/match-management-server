@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonNaming(SnakeCaseStrategy.class)
-public class EventDTO {
-    private EventId id;
+public class ExternalEventDTO {
+    private ExternalEventId id;
     private EventPayloadDTO payload;
 }

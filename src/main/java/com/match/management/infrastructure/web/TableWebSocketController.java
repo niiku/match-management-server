@@ -1,7 +1,9 @@
 package com.match.management.infrastructure.web;
 
-import com.match.management.domain.EventListener;
-import com.match.management.domain.EventRepository;
+import com.match.management.domain.*;
+import com.match.management.domain.match.MatchId;
+import com.match.management.domain.table.TableId;
+import com.match.management.domain.table.TableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -17,18 +19,26 @@ public class TableWebSocketController {
     @Autowired
     private EventRepository eventRepository;
 
+    @Autowired
+    private TableRepository tableRepository;
+
     @PostConstruct
     public void setup() {
-        eventRepository.subscribe(new EventListener() {
-            @Override
-            public void eventOcurred(Object event) {
-                tableUpdate();
+        eventRepository.subscribe(event -> {
+            if (event instanceof ResultUpdatedEvent) {
+                tableUpdate(((ResultUpdatedEvent)event).getMatchId());
+            } else if (event instanceof MatchAssignedToTableEvent) {
+                tableUpdate(((MatchAssignedToTableEvent)event).getTableId());
             }
         });
     }
 
-    public void tableUpdate() {
-        template.convertAndSend("/topic/table", TableDTO.builder().build());
+    private void tableUpdate(MatchId matchId) {
+        tableUpdate(tableRepository.findTable(matchId).getId());
+    }
+
+    private void tableUpdate(TableId tableId) {
+        template.convertAndSend("/topic/table", tableRepository.findTable(tableId));
     }
 
 }
