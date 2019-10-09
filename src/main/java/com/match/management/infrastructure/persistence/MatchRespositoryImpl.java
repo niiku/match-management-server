@@ -3,9 +3,7 @@ package com.match.management.infrastructure.persistence;
 import com.match.management.domain.match.*;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class MatchRespositoryImpl implements MatchRepository {
@@ -19,7 +17,7 @@ public class MatchRespositoryImpl implements MatchRepository {
         MatchId matchId = new MatchId(1);
         matches.put(matchId, new Match(matchId,
                 new Classification("Herren A"), playerA, playerB,
-                new Result(new ArrayList<>()), null, null));
+                new Result(Collections.singletonList(new GameResult(7, 11))), null, null));
     }
 
     @Override

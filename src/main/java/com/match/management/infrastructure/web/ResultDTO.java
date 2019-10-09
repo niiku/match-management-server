@@ -3,22 +3,28 @@ package com.match.management.infrastructure.web;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.match.management.domain.match.Result;
-import lombok.*;
-import org.apache.commons.lang3.tuple.Pair;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 @Data
 @Builder
+@AllArgsConstructor
 @NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonNaming(SnakeCaseStrategy.class)
 public class ResultDTO {
-    private List<Pair<Integer, Integer>> games;
+    private List<GameResultDTO> games;
 
     public static ResultDTO from(Result result) {
         return ResultDTO.builder()
-                .games(result.getSets())
+                .games(result.getGames().stream()
+                        .map(GameResultDTO::from)
+                        .collect(toList()))
                 .build();
     }
 
@@ -26,6 +32,8 @@ public class ResultDTO {
         if (result == null) {
             return null;
         }
-        return new Result(result.getGames());
+        return new Result(result.getGames().stream()
+                .map(GameResultDTO::to)
+                .collect(toList()));
     }
 }

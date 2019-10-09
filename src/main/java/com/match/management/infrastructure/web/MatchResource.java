@@ -3,7 +3,6 @@ package com.match.management.infrastructure.web;
 import com.match.management.domain.match.Match;
 import com.match.management.domain.match.MatchId;
 import com.match.management.domain.match.MatchRepository;
-import com.match.management.domain.match.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,9 +17,9 @@ public class MatchResource {
     MatchRepository matchRepository;
 
     @PutMapping(path = "{match_id}/result", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void updateResult(@PathVariable(name = "match_id") long matchId, Result result) {
+    public void updateResult(@PathVariable(name = "match_id") long matchId, @RequestBody ResultDTO result) {
         Match match = findMatch(matchId);
-        match.setMatchSets(result); //TODO: validierung mit operation
+        match.updateResult(ResultDTO.to(result));
     }
 
     private Match findMatch(@PathVariable(name = "match_id") long matchId) {
