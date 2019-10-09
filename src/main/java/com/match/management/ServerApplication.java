@@ -82,7 +82,7 @@ public class ServerApplication {
         updateResultService.updateResult(
                 new MatchId(0),
                 new Result(Arrays.asList(
-                        new GameResult(8, 10),
+                        new GameResult(8, 11),
                         new GameResult(12, 10),
                         new GameResult(29, 27),
                         new GameResult(11, 0)
