@@ -51,7 +51,7 @@ public class ApiMatchResourceTest {
         // TODO: create json programmatically
         mvc.perform(put("/matches/0/result")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"games\":[{\"player_ascore\":7,\"player_bscore\":11}]}"))
+                .content("{\"games\":[{\"score_player_a\":7,\"score_player_b\":11}]}"))
                 .andExpect(status().isOk());
         assertThat(matchRepository.findById(new MatchId(0)).getMatchSets())
                 .isEqualTo(result);

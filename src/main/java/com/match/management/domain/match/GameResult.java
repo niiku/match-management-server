@@ -4,6 +4,6 @@ import lombok.Value;
 
 @Value
 public class GameResult {
-    private final int playerAScore;
-    private final int playerBScore;
+    private final int scorePlayerA;
+    private final int scorePlayerB;
 }

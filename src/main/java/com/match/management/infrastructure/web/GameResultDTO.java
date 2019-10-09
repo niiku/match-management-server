@@ -1,6 +1,6 @@
 package com.match.management.infrastructure.web;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.match.management.domain.match.GameResult;
 import lombok.AllArgsConstructor;
@@ -12,21 +12,21 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+@JsonNaming(SnakeCaseStrategy.class)
 public class GameResultDTO {
 
-    private int playerAScore;
-    private int playerBScore;
+    private int scorePlayerA;
+    private int scorePlayerB;
 
     public static GameResultDTO from(GameResult gameResult) {
         return GameResultDTO.builder()
-                .playerAScore(gameResult.getPlayerAScore())
-                .playerBScore(gameResult.getPlayerBScore())
+                .scorePlayerA(gameResult.getScorePlayerA())
+                .scorePlayerB(gameResult.getScorePlayerB())
                 .build();
     }
 
     public static GameResult to(GameResultDTO gameResultDTO) {
         return (gameResultDTO == null) ?
-                null : new GameResult(gameResultDTO.playerAScore, gameResultDTO.playerBScore);
+                null : new GameResult(gameResultDTO.scorePlayerA, gameResultDTO.scorePlayerB);
     }
 }
