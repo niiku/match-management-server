@@ -38,7 +38,7 @@ public class TableWebSocketController {
     }
 
     private void tableUpdate(TableId tableId) {
-        template.convertAndSend("/topic/tables/" + tableId.getValue(), tableRepository.findTable(tableId));
+        template.convertAndSend("/topic/table", tableRepository.findTable(tableId));
     }
 
 }
