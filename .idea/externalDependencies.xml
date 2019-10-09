@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ExternalDependencies">
     <plugin id="Lombook Plugin" />
-    <plugin id="com.intellij.spring" />
     <plugin id="com.intellij.spring.boot" />
-    <plugin id="com.intellij.spring.mvc" />
-    <plugin id="com.intellij.spring.websocket" />
     <plugin id="in.1ton.idea.spring.assistant.plugin" />
     <plugin id="lermitage.intellij.extra.icons" />
     <plugin id="some.awesome" />
