@@ -28,14 +28,17 @@ public class MockingResource {
 
     @PostMapping("events")
     public void postEvent(@RequestBody EventDTO event) {
-        System.out.println(event);
         assert event.getId() == EventId.MATCH_ASSIGNED_TO_TABLE;
-        Table table = tableRepository.findTable(new TableId(event.getPayload().getTableId()));
         Match match = MatchDTO.to(event.getPayload().getMatch());
         matchRepository.save(match);
-        System.out.println(match);
-        System.out.println(table);
-        table.setActiveMatch(match.getId());
+
+        TableId tableId = new TableId(event.getPayload().getTableId());
+        Table table = tableRepository.findTable(tableId);
+        if (table == null) {
+            table = new Table(tableId, null, match.getId());
+        } else {
+            table.setActiveMatch(match.getId());
+        }
         tableRepository.save(table);
     }
 }
