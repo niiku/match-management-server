@@ -16,27 +16,13 @@ public class UpdateResultService {
     EventRepository eventRepository;
 
     public void updateResult(MatchId matchId, Result result) {
-        Match match = matchRepository.findById(matchId);
+        if(!result.isValid()) {
+            throw new InvalidResultException();
+        }
 
-        validateResult(result);
+        Match match = matchRepository.findById(matchId);
         match.updateResult(result);
 
         eventRepository.publishEvent(new ResultUpdatedEvent(matchId));
-    }
-
-    /**
-     * @throws InvalidGameResultException
-     */
-    void validateResult(Result result) {
-        result.getGames().forEach(this::validateGame);
-    }
-
-    private void validateGame(GameResult game) {
-        if (game.getScorePlayerA() < 11 && game.getScorePlayerB() < 11) {
-            throw new InvalidGameResultException("At least one value greater or equal 11 expected.");
-        }
-        if (game.getScorePlayerA() < 0 || game.getScorePlayerB() < 0) {
-            throw new InvalidGameResultException("Negative values are not allowed");
-        }
     }
 }

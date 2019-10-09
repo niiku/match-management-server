@@ -23,4 +23,8 @@ public final class Result {
                 .filter(g -> g.getScorePlayerA() < g.getScorePlayerB())
                 .count();
     }
+
+    public boolean isValid() {
+        return games != null && games.stream().allMatch(GameResult::isValid);
+    }
 }
