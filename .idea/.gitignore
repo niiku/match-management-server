@@ -4,4 +4,5 @@ $CACHE_FILE$
 $PRODUCT_WORKSPACE_FILE$
 modules.xml
 libraries/**
+/uiDesigner.xml
 shelf
