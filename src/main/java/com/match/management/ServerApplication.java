@@ -1,5 +1,9 @@
 package com.match.management;
 
+import com.match.management.application.UpdateResultService;
+import com.match.management.domain.match.GameResult;
+import com.match.management.domain.match.MatchId;
+import com.match.management.domain.match.Result;
 import com.match.management.infrastructure.web.*;
 import io.swagger.v3.oas.models.OpenAPI;
 import org.springdoc.api.OpenApiCustomiser;
@@ -11,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @SpringBootApplication
@@ -19,6 +24,9 @@ public class ServerApplication {
 
     @Autowired
     MockingResource mockingResource;
+
+    @Autowired
+    UpdateResultService updateResultService;
 
     public static void main(String[] args) {
         SpringApplication.run(ServerApplication.class, args);
@@ -70,5 +78,16 @@ public class ServerApplication {
                         .build())
                 .build());
         }
+
+        updateResultService.updateResult(
+                new MatchId(0),
+                new Result(Arrays.asList(
+                        new GameResult(8, 10),
+                        new GameResult(12, 10),
+                        new GameResult(29, 27),
+                        new GameResult(11, 0)
+                ))
+        );
+
     }
 }
