@@ -5,8 +5,7 @@ import com.match.management.domain.match.MatchId;
 import com.match.management.domain.match.MatchRepository;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class MatchRespositoryImpl implements MatchRepository {
@@ -22,4 +21,5 @@ public class MatchRespositoryImpl implements MatchRepository {
     public void save(Match match) {
         matches.put(match.getId(), match);
     }
+
 }
