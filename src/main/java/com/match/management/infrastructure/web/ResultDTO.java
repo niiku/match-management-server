@@ -1,6 +1,7 @@
 package com.match.management.infrastructure.web;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy.SnakeCaseStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.match.management.domain.match.Result;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
