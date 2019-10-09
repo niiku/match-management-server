@@ -1,6 +1,5 @@
 package com.match.management.infrastructure.persistence;
 
-import com.match.management.domain.match.MatchId;
 import com.match.management.domain.table.Table;
 import com.match.management.domain.table.TableId;
 import com.match.management.domain.table.TableManagerId;
@@ -17,13 +16,6 @@ import java.util.stream.Collectors;
 public class TableRepositoryImpl implements TableRepository {
 
     private static Map<TableId, Table> tables = new HashMap<>();
-
-    static {
-        for (int i = 1; i <= 3; i++) {
-            TableId tableId = new TableId(String.valueOf(i));
-            tables.put(tableId, new Table(tableId, new TableManagerId(1), new MatchId(1)));
-        }
-    }
 
     @Override
     public List<Table> getTables() {
@@ -44,6 +36,10 @@ public class TableRepositoryImpl implements TableRepository {
 
     @Override
     public void save(Table table) {
+        Table existingTable = findTable(table.getId());
+        if (existingTable == null) {
+            table.setTableManagerId(new TableManagerId(((tables.size() + 1) / 5) + 1));
+        }
         tables.put(table.getId(), table);
     }
 }

@@ -32,7 +32,7 @@ public class ApiMatchResourceTest {
 
     @Test
     public void getMatch_HappyFlow() throws Exception {
-        mvc.perform(get("/matches/1"))
+        mvc.perform(get("/matches/0"))
                 .andExpect(status().isOk());
     }
 
@@ -49,11 +49,11 @@ public class ApiMatchResourceTest {
     public void updateResult_happy_flow() throws Exception {
         Result result = new Result(singletonList(new GameResult(7, 11)));
         // TODO: create json programmatically
-        mvc.perform(put("/matches/1/result")
+        mvc.perform(put("/matches/0/result")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"games\":[{\"player_ascore\":7,\"player_bscore\":11}]}"))
                 .andExpect(status().isOk());
-        assertThat(matchRepository.findById(new MatchId(1)).getMatchSets())
+        assertThat(matchRepository.findById(new MatchId(0)).getMatchSets())
                 .isEqualTo(result);
     }
 }
