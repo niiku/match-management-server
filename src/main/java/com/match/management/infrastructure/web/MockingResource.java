@@ -1,5 +1,7 @@
 package com.match.management.infrastructure.web;
 
+import com.match.management.domain.EventRepository;
+import com.match.management.domain.MatchAssignedToTableEvent;
 import com.match.management.domain.match.Match;
 import com.match.management.domain.match.MatchRepository;
 import com.match.management.domain.table.Table;
@@ -26,9 +28,12 @@ public class MockingResource {
     @Autowired
     MatchRepository matchRepository;
 
+    @Autowired
+    EventRepository eventRepository;
+
     @PostMapping("events")
-    public void postEvent(@RequestBody EventDTO event) {
-        assert event.getId() == EventId.MATCH_ASSIGNED_TO_TABLE;
+    public void postEvent(@RequestBody ExternalEventDTO event) {
+        assert event.getId() == ExternalEventId.MATCH_ASSIGNED_TO_TABLE;
         Match match = MatchDTO.to(event.getPayload().getMatch());
         matchRepository.save(match);
 
@@ -40,5 +45,6 @@ public class MockingResource {
             table.setActiveMatch(match.getId());
         }
         tableRepository.save(table);
+        eventRepository.publishEvent(new MatchAssignedToTableEvent(tableId, match.getId()));
     }
 }

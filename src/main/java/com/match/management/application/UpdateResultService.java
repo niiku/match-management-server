@@ -1,6 +1,7 @@
 package com.match.management.application;
 
 import com.match.management.domain.EventRepository;
+import com.match.management.domain.ResultUpdatedEvent;
 import com.match.management.domain.match.Match;
 import com.match.management.domain.match.MatchId;
 import com.match.management.domain.match.MatchRepository;
@@ -25,7 +26,7 @@ public class UpdateResultService {
         match.updateResult(result);
 
         // TODO publish event
-        eventRepository.publishEvent(matchId);
+        eventRepository.publishEvent(new ResultUpdatedEvent(matchId));
     }
 
 }

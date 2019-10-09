@@ -27,7 +27,7 @@ public class TableResource {
         if(tableManagerId == null) {
             tables = tableRepository.getTables();
         } else {
-            tables = tableRepository.findTablesByTableManager(new TableManagerId(tableManagerId.intValue()));
+            tables = tableRepository.findTables(new TableManagerId(tableManagerId.intValue()));
         }
         return tables.stream()
                 .map(table -> TableDTO.from(table, matchId -> matchRepository.findById(matchId)))
