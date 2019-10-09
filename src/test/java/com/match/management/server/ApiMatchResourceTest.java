@@ -61,7 +61,7 @@ public class ApiMatchResourceTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"games\":[{\"score_player_a\":7,\"score_player_b\":11}]}"))
                 .andExpect(status().isOk());
-        assertThat(matchRepository.findById(new MatchId(0)).getMatchSets())
+        assertThat(matchRepository.findById(new MatchId(0)).getResult())
                 .isEqualTo(result);
         assertThat(catchEvents.get()).isNotNull();
     }
