@@ -13,7 +13,7 @@ public class TableWebSocketController {
 
     @Scheduled(fixedRate = 1000)
     public void tableUpdate() {
-        System.out.println(">>>>>>>>>>>>>> sending table to client ");
+        //System.out.println(">>>>>>>>>>>>>> sending table to client ");
         template.convertAndSend("/topic/table", TableDTO.builder().build());
     }
 

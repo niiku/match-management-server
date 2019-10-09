@@ -13,5 +13,4 @@ public class Table {
     private TableId id;
     private TableManagerId tableManagerId;
     private MatchId activeMatch;
-
 }
