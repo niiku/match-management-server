@@ -38,6 +38,7 @@ public class Match {
             switch(state) { // used switch for any future state
                 case FINISHED:
                     validateFinishState();
+                case ASSIGNED:
                 default:
                     this.state = state;
             }
