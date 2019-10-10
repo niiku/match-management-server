@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 
 public class MatchServiceTest {
 
-    private final Match match = new Match(new MatchId(0), null, null, null, null, null, null);
+    private final Match match = Match.builder().id(new MatchId(0)).build();
 
     private Result result;
 
@@ -33,7 +33,7 @@ public class MatchServiceTest {
         matchService.matchRepository = mock(MatchRepository.class);
         when(matchService.matchRepository.findById(any()))
                 .thenReturn(match);
-        matchService.eventBus =  mock(EventBus.class);
+        matchService.eventBus = mock(EventBus.class);
     }
 
     @Test()
