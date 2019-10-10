@@ -3,11 +3,12 @@ package com.match.management.domain.match;
 import com.match.management.domain.ddd.Aggregate;
 import com.match.management.domain.ddd.AggregateId;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Aggregate
-@AllArgsConstructor
+@Builder
 public class Match {
 
     public enum State {

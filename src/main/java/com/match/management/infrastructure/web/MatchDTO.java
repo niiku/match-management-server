@@ -38,14 +38,14 @@ public class MatchDTO {
     }
 
     public static Match to(MatchDTO match) {
-        return new Match(
-                new MatchId(match.getMatchId()),
-                StringUtils.isEmpty(match.state) ? null : Match.State.valueOf(match.state),
-                new Classification(match.getClassification()),
-                new Stage(match.getStage()),
-                PlayerDTO.to(match.getPlayerA()),
-                PlayerDTO.to(match.getPlayerB()),
-                ResultDTO.to(match.getResult())
-        );
+        return Match.builder()
+                .id(new MatchId(match.getMatchId()))
+                .state(StringUtils.isEmpty(match.state) ? null : Match.State.valueOf(match.state))
+                .classification(new Classification(match.getClassification()))
+                .stage(new Stage(match.getStage()))
+                .playerA(PlayerDTO.to(match.getPlayerA()))
+                .playerB(PlayerDTO.to(match.getPlayerB()))
+                .result(ResultDTO.to(match.getResult()))
+                .build();
     }
 }
