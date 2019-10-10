@@ -5,6 +5,8 @@ import com.match.management.domain.match.MatchId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.List;
+
 
 @Data
 @Aggregate
@@ -12,5 +14,9 @@ import lombok.Data;
 public class Table {
     private TableId id;
     private TableManagerId tableManagerId;
-    private MatchId activeMatch;
+    private List<MatchId> matches;
+
+    public MatchId getActiveMatch() {
+        return (matches == null || matches.isEmpty()) ? null : matches.get(0);
+    }
 }
