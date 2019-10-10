@@ -7,10 +7,7 @@ import com.match.management.domain.table.TableManagerId;
 import com.match.management.domain.table.TableRepository;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -20,7 +17,9 @@ public class TableRepositoryImpl implements TableRepository {
 
     @Override
     public List<Table> getTables() {
-        return new ArrayList<>(tables.values());
+        ArrayList<Table> tables = new ArrayList<>(TableRepositoryImpl.tables.values());
+        tables.sort(Comparator.comparingInt(table -> Integer.parseInt(table.getId().getValue())));
+        return tables;
     }
 
     @Override
@@ -47,7 +46,7 @@ public class TableRepositoryImpl implements TableRepository {
     public void save(Table table) {
         Table existingTable = findTable(table.getId());
         if (existingTable == null) {
-            table.setTableManagerId(new TableManagerId(((tables.size() + 1) / 5) + 1));
+            table.setTableManagerId(new TableManagerId(((tables.size()) / 5) + 1));
         }
         tables.put(table.getId(), table);
     }
