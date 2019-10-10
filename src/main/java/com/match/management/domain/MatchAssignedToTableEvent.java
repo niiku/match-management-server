@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class MatchAssignedToTableEvent implements Event {
+public class MatchAssignedToTableEvent implements TTTEvent {
     private TableId tableId;
     private MatchId matchId;
 }

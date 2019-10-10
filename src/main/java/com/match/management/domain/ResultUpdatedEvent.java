@@ -6,6 +6,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ResultUpdatedEvent implements Event {
+public class ResultUpdatedEvent implements TTTEvent {
     private MatchId matchId;
 }

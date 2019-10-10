@@ -1,10 +1,12 @@
 package com.match.management.application;
 
-import com.match.management.domain.EventRepository;
 import com.match.management.domain.ResultUpdatedEvent;
+import com.match.management.domain.TTTEvent;
 import com.match.management.domain.match.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.bus.Event;
+import reactor.bus.EventBus;
 
 @Service
 public class UpdateResultService {
@@ -13,7 +15,7 @@ public class UpdateResultService {
     MatchRepository matchRepository;
 
     @Autowired
-    EventRepository eventRepository;
+    private EventBus eventBus;
 
     public void updateResult(MatchId matchId, Result result) {
         if(!result.isValid()) {
@@ -23,6 +25,6 @@ public class UpdateResultService {
         Match match = matchRepository.findById(matchId);
         match.updateResult(result);
 
-        eventRepository.publishEvent(new ResultUpdatedEvent(matchId));
+        eventBus.notify(TTTEvent.class, Event.wrap(new ResultUpdatedEvent(matchId)));
     }
 }

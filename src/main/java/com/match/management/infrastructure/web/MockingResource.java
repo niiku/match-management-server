@@ -1,7 +1,8 @@
 package com.match.management.infrastructure.web;
 
-import com.match.management.domain.EventRepository;
 import com.match.management.domain.MatchAssignedToTableEvent;
+import com.match.management.domain.ResultUpdatedEvent;
+import com.match.management.domain.TTTEvent;
 import com.match.management.domain.match.Match;
 import com.match.management.domain.match.MatchRepository;
 import com.match.management.domain.table.Table;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.bus.Event;
+import reactor.bus.EventBus;
 
 @RestController
 @RequestMapping(
@@ -23,13 +26,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class MockingResource {
 
     @Autowired
-    TableRepository tableRepository;
+    private TableRepository tableRepository;
 
     @Autowired
-    MatchRepository matchRepository;
+    private MatchRepository matchRepository;
 
     @Autowired
-    EventRepository eventRepository;
+    private EventBus eventBus;
 
     @PostMapping("events")
     public void postEvent(@RequestBody ExternalEventDTO event) {
@@ -45,6 +48,6 @@ public class MockingResource {
             table.setActiveMatch(match.getId());
         }
         tableRepository.save(table);
-        eventRepository.publishEvent(new MatchAssignedToTableEvent(tableId, match.getId()));
+        eventBus.notify(TTTEvent.class, Event.wrap(new MatchAssignedToTableEvent(tableId, match.getId())));
     }
 }

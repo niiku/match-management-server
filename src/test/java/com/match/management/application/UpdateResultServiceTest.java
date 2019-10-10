@@ -1,7 +1,5 @@
 package com.match.management.application;
 
-
-import com.match.management.domain.EventRepository;
 import com.match.management.domain.match.*;
 import org.junit.Before;
 import org.junit.Rule;
@@ -26,13 +24,12 @@ public class UpdateResultServiceTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         result = new Result(new ArrayList<>());
         updateResultService = new UpdateResultService();
         updateResultService.matchRepository = mock(MatchRepository.class);
         when(updateResultService.matchRepository.findById(any()))
                 .thenReturn(t);
-        updateResultService.eventRepository =  mock(EventRepository.class);
     }
 
     @Test()
