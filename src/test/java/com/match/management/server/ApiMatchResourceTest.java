@@ -14,9 +14,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import reactor.bus.Event;
 import reactor.bus.EventBus;
-import reactor.fn.Consumer;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -56,46 +56,45 @@ public class ApiMatchResourceTest {
 
     @Test
     public void updateResult_happy_flow() throws Exception {
-        AtomicReference<Object> catchEvents = new AtomicReference<>();
-        Consumer<Event<TTTEvent>> eventconsumer = catchEvents::set;
-        eventBus.on($(TTTEvent.class), eventconsumer);
+        List<Event> catchEvents = new ArrayList<>();
+        eventBus.on($(TTTEvent.class), event -> {
+            if(event.getData() instanceof ResultUpdatedEvent) {
+                catchEvents.add(event);
+            }
+        });
 
         Result result = new Result(singletonList(new GameResult(7, 11)));
         mvc.perform(put("/matches/0/result")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"games\":[{\"score_player_a\":7,\"score_player_b\":11}]}"))
                 .andExpect(status().isOk());
+
         assertThat(matchRepository.findById(new MatchId(0)).getResult())
                 .isEqualTo(result);
-        await().atMost(5, TimeUnit.SECONDS).until(() -> catchEvents.get() != null);
-        assertThat(catchEvents.get().getClass().equals(ResultUpdatedEvent.class));
+        await().atMost(5, TimeUnit.SECONDS).until(() -> !catchEvents.isEmpty());
+        assertThat(catchEvents.get(0).getData()).isInstanceOf(ResultUpdatedEvent.class);
     }
 
     @Test
     public void updateState_Finished_Happy_Flow() throws Exception {
-        //prepare
-        AtomicReference<Object> catchEvents = new AtomicReference<>();
-        Consumer<Event<TTTEvent>> eventconsumer = catchEvents::set;
-        eventBus.on($(TTTEvent.class), eventconsumer);
+        List<Event> catchEvents = new ArrayList<>();
+        eventBus.on($(TTTEvent.class), event -> {
+            if(event.getData() instanceof MatchStateChangedEvent) {
+                catchEvents.add(event);
+            }
+        });
 
-        Result result = new Result(Arrays.asList(new GameResult(7, 11),
-                new GameResult(5, 11),
-                new GameResult(11, 9),
-                new GameResult(2, 11)));
-
-        //act
         mvc.perform(put("/matches/0/state")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"state\" : \"FINISHED\"}"))
                 .andExpect(status().isOk());
 
-        //assert
         Match match = matchRepository.findById(new MatchId(0));
         assertThat(match.getState())
                 .isEqualTo(Match.State.FINISHED);
 
-        await().atMost(5, TimeUnit.SECONDS).until(() -> catchEvents.get() != null);
-        assertThat(catchEvents.get().getClass().equals(MatchStateChangedEvent.class));
+        await().atMost(5, TimeUnit.SECONDS).until(() -> !catchEvents.isEmpty());
+        assertThat(catchEvents.get(0).getData()).isInstanceOf(MatchStateChangedEvent.class);
     }
 
  @Test
