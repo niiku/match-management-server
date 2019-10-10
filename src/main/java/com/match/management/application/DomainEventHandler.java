@@ -24,7 +24,6 @@ public class DomainEventHandler {
     private final EventBus eventBus;
 
     private final TableRepository tableRepository;
-    private final MatchRepository matchRepository;
 
     @PostConstruct
     void postConstruct() {

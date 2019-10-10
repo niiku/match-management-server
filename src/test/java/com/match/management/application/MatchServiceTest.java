@@ -2,6 +2,10 @@ package com.match.management.application;
 
 
 import com.match.management.domain.match.*;
+import com.match.management.domain.table.Table;
+import com.match.management.domain.table.TableId;
+import com.match.management.domain.table.TableRepository;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,17 +27,17 @@ public class MatchServiceTest {
 
     private MatchService matchService;
 
+    private MatchRepository matchRepositoryMock = mock(MatchRepository.class);
+    private TableRepository tableRepositoryMock = mock(TableRepository.class);
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void setUp() {
         result = new Result(new ArrayList<>());
-        matchService = new MatchService();
-        matchService.matchRepository = mock(MatchRepository.class);
-        when(matchService.matchRepository.findById(any()))
-                .thenReturn(match);
-        matchService.eventBus = mock(EventBus.class);
+        matchService = new MatchService(matchRepositoryMock, tableRepositoryMock, mock(EventBus.class));
+        when(matchRepositoryMock.findById(any())).thenReturn(match);
     }
 
     @Test()
@@ -66,6 +70,8 @@ public class MatchServiceTest {
         match.updateResult(result);
 
         matchService.updateState(match, Match.State.FINISHED);
+
+        Assert.assertSame(Match.State.FINISHED, match.getState());
     }
 
     @Test
@@ -86,4 +92,29 @@ public class MatchServiceTest {
 
         matchService.updateState(match, Match.State.FINISHED);
     }
+
+    @Test
+    public void setState_Started_HappyCase() {
+        when(tableRepositoryMock.findTable(match.getId())).thenReturn(Table.builder().id(new TableId("1")).build());
+
+        matchService.updateState(match, Match.State.STARTED);
+
+        Assert.assertSame(Match.State.STARTED, match.getState());
+    }
+
+    @Test
+    public void setState_Started_Rejected() {
+        Table table = Table.builder().id(new TableId("1")).build();
+        table.getMatches().add(match.getId());
+        MatchId id = new MatchId(55);
+        Match match2 = Match.builder().id(id).state(Match.State.STARTED).build();
+        table.getMatches().add(match2.getId());
+        when(matchRepositoryMock.findById(id)).thenReturn(match2);
+        when(tableRepositoryMock.findTable(match.getId())).thenReturn(table);
+
+        thrown.expect(IllegalStateException.class);
+        matchService.updateState(match, Match.State.STARTED);
+    }
+
+
 }
