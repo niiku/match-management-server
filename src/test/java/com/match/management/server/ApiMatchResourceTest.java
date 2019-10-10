@@ -1,7 +1,8 @@
 package com.match.management.server;
 
+import com.google.gson.Gson;
+import com.match.management.domain.MatchStateChangedEvent;
 import com.match.management.domain.TTTEvent;
-import com.google.gson.Gson;import com.match.management.domain.MatchStateChangedEvent;
 import com.match.management.domain.match.*;
 import com.match.management.infrastructure.web.MatchStateDTO;
 import org.junit.Test;
@@ -17,10 +18,12 @@ import reactor.bus.EventBus;
 import reactor.fn.Consumer;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -93,7 +96,8 @@ public class ApiMatchResourceTest {
         //assert
         assertThat(matchRepository.findById(new MatchId(0)).getState().getValue())
                 .isEqualTo(MatchState.State.FINISHED);
-        assertThat(catchEvents.get()).isNotNull();
+
+        await().atMost(5, TimeUnit.SECONDS).until(() -> catchEvents.get() != null);
         assertThat(catchEvents.get().getClass().equals(MatchStateChangedEvent.class));
     }
 
