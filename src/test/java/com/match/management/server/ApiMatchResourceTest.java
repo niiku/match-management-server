@@ -18,7 +18,6 @@ import reactor.bus.EventBus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +43,7 @@ public class ApiMatchResourceTest {
 
     @Test
     public void getMatch_HappyFlow() throws Exception {
-        mvc.perform(get("/matches/0"))
+        mvc.perform(get("/matches/10"))
                 .andExpect(status().isOk());
     }
 
@@ -64,12 +63,12 @@ public class ApiMatchResourceTest {
         });
 
         Result result = new Result(singletonList(new GameResult(7, 11)));
-        mvc.perform(put("/matches/0/result")
+        mvc.perform(put("/matches/10/result")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"games\":[{\"score_player_a\":7,\"score_player_b\":11}]}"))
                 .andExpect(status().isOk());
 
-        assertThat(matchRepository.findById(new MatchId(0)).getResult())
+        assertThat(matchRepository.findById(new MatchId(10)).getResult())
                 .isEqualTo(result);
         await().atMost(5, TimeUnit.SECONDS).until(() -> !catchEvents.isEmpty());
         assertThat(catchEvents.get(0).getData()).isInstanceOf(ResultUpdatedEvent.class);
@@ -84,12 +83,12 @@ public class ApiMatchResourceTest {
             }
         });
 
-        mvc.perform(put("/matches/0/state")
+        mvc.perform(put("/matches/10/state")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"state\" : \"FINISHED\"}"))
                 .andExpect(status().isOk());
 
-        Match match = matchRepository.findById(new MatchId(0));
+        Match match = matchRepository.findById(new MatchId(10));
         assertThat(match.getState())
                 .isEqualTo(Match.State.FINISHED);
 
@@ -99,7 +98,7 @@ public class ApiMatchResourceTest {
 
  @Test
     public void updateResult_validation_error() throws Exception {
-        mvc.perform(put("/matches/0/result")
+        mvc.perform(put("/matches/10/result")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"games\":[{\"score_player_a\":7,\"score_player_b\":8}]}"))
                 .andExpect(status().is(400));
