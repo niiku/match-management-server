@@ -5,6 +5,9 @@ import com.match.management.domain.TTTEvent;
 import com.match.management.domain.match.GameResult;
 import com.match.management.domain.match.MatchId;
 import com.match.management.domain.match.Result;
+import com.match.management.domain.table.Table;
+import com.match.management.domain.table.TableId;
+import com.match.management.domain.table.TableRepository;
 import com.match.management.infrastructure.web.*;
 import org.springdoc.api.OpenApiCustomiser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +46,9 @@ public class ServerApplication implements CommandLineRunner {
     public void run(String... args) {
         eventBus.on($(TTTEvent.class), notificationConsumer);
     }
+
+    @Autowired
+    private TableRepository tableRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(ServerApplication.class, args);
@@ -124,7 +130,9 @@ public class ServerApplication implements CommandLineRunner {
                         )
                         .build())
                 .build());
+
         }
+        tableRepository.save(Table.builder().id(new TableId("15")).build());
 
         matchService.updateResult(
                 new MatchId(0),
