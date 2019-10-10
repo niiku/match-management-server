@@ -26,7 +26,7 @@ public class MatchDTO {
                 .classification(match.getClassification().getValue())
                 .playerA(PlayerDTO.from(match.getPlayerA()))
                 .playerB(PlayerDTO.from(match.getPlayerB()))
-                .result(ResultDTO.from(match.getMatchSets()))
+                .result(ResultDTO.from(match.getResult()))
                 .build();
     }
 
@@ -36,9 +36,7 @@ public class MatchDTO {
                 new Classification(match.getClassification()),
                 PlayerDTO.to(match.getPlayerA()),
                 PlayerDTO.to(match.getPlayerB()),
-                ResultDTO.to(match.getResult()),
-                null,
-                null
+                ResultDTO.to(match.getResult())
         );
     }
 }

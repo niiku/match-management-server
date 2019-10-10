@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 
 public class UpdateResultServiceTest {
 
-    private final Match t = new Match(new MatchId(0), null, null, null, null, null, null);
+    private final Match t = new Match(new MatchId(0), null, null, null, null);
 
     private Result result;
 

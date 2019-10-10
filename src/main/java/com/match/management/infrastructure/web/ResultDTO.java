@@ -19,12 +19,16 @@ import static java.util.stream.Collectors.toList;
 @JsonNaming(SnakeCaseStrategy.class)
 public class ResultDTO {
     private List<GameResultDTO> games;
+    private int gamesWonPlayerA;
+    private int gamesWonPlayerB;
 
     public static ResultDTO from(Result result) {
         return ResultDTO.builder()
                 .games(result.getGames().stream()
                         .map(GameResultDTO::from)
                         .collect(toList()))
+                .gamesWonPlayerA(result.getGamesWonPlayerA())
+                .gamesWonPlayerB(result.getGamesWonPlayerB())
                 .build();
     }
 

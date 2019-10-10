@@ -5,8 +5,6 @@ import com.match.management.domain.ddd.AggregateId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Aggregate
 @AllArgsConstructor
@@ -18,12 +16,12 @@ public class Match {
     private Classification classification;
     private Player playerA;
     private Player playerB;
-    private Result matchSets;
-    private LocalDateTime start;
-    private LocalDateTime end;
+    private Result result;
+
+
 
     public void updateResult(Result result) {
-        this.matchSets = result;
+        this.result = result;
     }
 
 }
