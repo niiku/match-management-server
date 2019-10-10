@@ -14,7 +14,7 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonNaming(SnakeCaseStrategy.class)
 public class MatchDTO {
-    
+
     private long matchId;
     private String classification;
     private String stage;
@@ -37,6 +37,7 @@ public class MatchDTO {
     public static Match to(MatchDTO match) {
         return new Match(
                 new MatchId(match.getMatchId()),
+                null,
                 new Classification(match.getClassification()),
                 new Stage(match.getStage()),
                 PlayerDTO.to(match.getPlayerA()),

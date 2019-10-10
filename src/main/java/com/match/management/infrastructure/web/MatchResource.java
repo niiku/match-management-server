@@ -1,10 +1,11 @@
 package com.match.management.infrastructure.web;
 
 import com.match.management.application.InvalidResultException;
-import com.match.management.application.UpdateResultService;
+import com.match.management.application.MatchService;
 import com.match.management.domain.match.Match;
 import com.match.management.domain.match.MatchId;
 import com.match.management.domain.match.MatchRepository;
+import com.match.management.domain.match.MatchState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,7 +20,7 @@ public class MatchResource {
     MatchRepository matchRepository;
 
     @Autowired
-    UpdateResultService updateResultService;
+    MatchService matchService;
 
     @PutMapping(path = "{match_id}/result", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void updateResult(@PathVariable(name = "match_id") long matchId, @RequestBody ResultDTO result) {
@@ -42,6 +43,12 @@ public class MatchResource {
     @GetMapping(path = "{match_id}")
     public MatchDTO getMatch(@PathVariable(name = "match_id") long matchId) {
         return MatchDTO.from(findMatch(matchId));
+    }
+
+    @PutMapping(path = "{match_id}/state", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void updateState(@PathVariable(name = "match_id") long matchId, @RequestBody MatchState state) {
+        Match match = findMatch(matchId);
+        matchService.updateState(match, state);
     }
 
 }

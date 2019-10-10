@@ -1,5 +1,6 @@
 package com.match.management.application;
 
+import com.match.management.domain.MatchStateChangedEvent;
 import com.match.management.domain.ResultUpdatedEvent;
 import com.match.management.domain.TTTEvent;
 import com.match.management.domain.match.*;
@@ -9,7 +10,7 @@ import reactor.bus.Event;
 import reactor.bus.EventBus;
 
 @Service
-public class UpdateResultService {
+public class MatchService {
 
     @Autowired
     MatchRepository matchRepository;
@@ -18,13 +19,27 @@ public class UpdateResultService {
     private EventBus eventBus;
 
     public void updateResult(MatchId matchId, Result result) {
+        Match match = matchRepository.findById(matchId);
+        updateResult(match, result);
+    }
+
+    public void updateResult(Match match, Result result) {
         if(!result.isValid()) {
             throw new InvalidResultException();
         }
-
-        Match match = matchRepository.findById(matchId);
         match.updateResult(result);
 
-        eventBus.notify(TTTEvent.class, Event.wrap(new ResultUpdatedEvent(matchId)));
+        eventRepository.publishEvent(new ResultUpdatedEvent(match.getId()));
+    }
+
+    public void updateState(MatchId matchId, MatchState state) {
+        Match match = matchRepository.findById(matchId);
+        updateState(match, state);
+    }
+
+    public void updateState(Match match, MatchState state) {
+        match.setState(state);
+
+        eventRepository.publishEvent(new MatchStateChangedEvent(match.getId(), match.getState()));
     }
 }

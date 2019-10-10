@@ -13,16 +13,40 @@ public class Match {
     @AggregateId
     private MatchId id;
 
+    private MatchState state;
     private Classification classification;
     private Stage stage;
     private Player playerA;
     private Player playerB;
     private Result result;
 
-
-
     public void updateResult(Result result) {
         this.result = result;
+    }
+
+    public void setState(MatchState state) {
+        if(state == null) {
+            this.state = null;
+        } else {
+            switch(state.getValue()) { // used switch for any future state
+                case FINISHED:
+                    validateFinishState();
+                default:
+                    this.state = state;
+            }
+        }
+    }
+
+    /**
+     * @throws IllegalStateException in case of any invalid result
+     */
+    private void validateFinishState() {
+        if (this.result == null || this.result.getGames() == null || this.result.getGames().isEmpty()) {
+            throw new IllegalStateException("Match without result cannot be set to finished");
+        }
+        if ( Math.max(result.getGamesWonPlayerA(), result.getGamesWonPlayerB()) < 3) {
+            throw new IllegalStateException("Match without 3 won games by any player cannot be set to finished");
+        }
     }
 
 }

@@ -1,6 +1,6 @@
 package com.match.management;
 
-import com.match.management.application.UpdateResultService;
+import com.match.management.application.MatchService;
 import com.match.management.domain.TTTEvent;
 import com.match.management.domain.match.GameResult;
 import com.match.management.domain.match.MatchId;
@@ -31,7 +31,7 @@ public class ServerApplication implements CommandLineRunner {
     private MockingResource mockingResource;
 
     @Autowired
-    private UpdateResultService updateResultService;
+    private MatchService matchService;
 
     @Autowired
     private EventBus eventBus;
@@ -126,7 +126,7 @@ public class ServerApplication implements CommandLineRunner {
                 .build());
         }
 
-        updateResultService.updateResult(
+        matchService.updateResult(
                 new MatchId(0),
                 new Result(Arrays.asList(
                         new GameResult(8, 11),
