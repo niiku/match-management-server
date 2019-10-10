@@ -14,6 +14,7 @@ public class Match {
     private MatchId id;
 
     private Classification classification;
+    private Stage stage;
     private Player playerA;
     private Player playerB;
     private Result result;
