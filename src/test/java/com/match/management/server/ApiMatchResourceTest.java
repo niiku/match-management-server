@@ -14,9 +14,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import reactor.bus.Event;
 import reactor.bus.EventBus;
-import reactor.fn.Consumer;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -56,9 +56,12 @@ public class ApiMatchResourceTest {
 
     @Test
     public void updateResult_happy_flow() throws Exception {
-        AtomicReference<Object> catchEvents = new AtomicReference<>();
-        Consumer<Event<TTTEvent>> eventconsumer = catchEvents::set;
-        eventBus.on($(TTTEvent.class), eventconsumer);
+        List<Event> catchEvents = new ArrayList<>();
+        eventBus.on($(TTTEvent.class), event -> {
+            if(event.getData() instanceof ResultUpdatedEvent) {
+                catchEvents.add(event);
+            }
+        });
 
         Result result = new Result(singletonList(new GameResult(7, 11)));
         mvc.perform(put("/matches/0/result")
@@ -68,15 +71,18 @@ public class ApiMatchResourceTest {
 
         assertThat(matchRepository.findById(new MatchId(0)).getResult())
                 .isEqualTo(result);
-        await().atMost(5, TimeUnit.SECONDS).until(() -> catchEvents.get() != null);
-        assertThat(catchEvents.get()).isInstanceOf(ResultUpdatedEvent.class);
+        await().atMost(5, TimeUnit.SECONDS).until(() -> !catchEvents.isEmpty());
+        assertThat(catchEvents.get(0).getData()).isInstanceOf(ResultUpdatedEvent.class);
     }
 
     @Test
     public void updateState_Finished_Happy_Flow() throws Exception {
-        AtomicReference<Object> catchEvents = new AtomicReference<>();
-        Consumer<Event<TTTEvent>> eventconsumer = catchEvents::set;
-        eventBus.on($(TTTEvent.class), eventconsumer);
+        List<Event> catchEvents = new ArrayList<>();
+        eventBus.on($(TTTEvent.class), event -> {
+            if(event.getData() instanceof MatchStateChangedEvent) {
+                catchEvents.add(event);
+            }
+        });
 
         mvc.perform(put("/matches/0/state")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -87,8 +93,8 @@ public class ApiMatchResourceTest {
         assertThat(match.getState())
                 .isEqualTo(Match.State.FINISHED);
 
-        await().atMost(5, TimeUnit.SECONDS).until(() -> catchEvents.get() != null);
-        assertThat(catchEvents.get()).isInstanceOf(MatchStateChangedEvent.class);
+        await().atMost(5, TimeUnit.SECONDS).until(() -> !catchEvents.isEmpty());
+        assertThat(catchEvents.get(0).getData()).isInstanceOf(MatchStateChangedEvent.class);
     }
 
  @Test
