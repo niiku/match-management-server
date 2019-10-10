@@ -26,6 +26,7 @@ public class MatchDTO {
         if (match == null) return null;
         return MatchDTO.builder()
                 .matchId(match.getId().getValue())
+                .state(MatchStateDTO.builder().state(match.getState().getValue() != null ? match.getState().getValue().toString() : null).build())
                 .classification(match.getClassification().getValue())
                 .stage(match.getStage().getValue())
                 .playerA(PlayerDTO.from(match.getPlayerA()))
@@ -37,7 +38,7 @@ public class MatchDTO {
     public static Match to(MatchDTO match) {
         return new Match(
                 new MatchId(match.getMatchId()),
-                null,
+                new MatchState((match.state != null) ? MatchState.State.valueOf(match.state.getState()) : null),
                 new Classification(match.getClassification()),
                 new Stage(match.getStage()),
                 PlayerDTO.to(match.getPlayerA()),

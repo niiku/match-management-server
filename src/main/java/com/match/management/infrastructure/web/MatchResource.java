@@ -46,9 +46,9 @@ public class MatchResource {
     }
 
     @PutMapping(path = "{match_id}/state", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void updateState(@PathVariable(name = "match_id") long matchId, @RequestBody MatchState state) {
+    public void updateState(@PathVariable(name = "match_id") long matchId, @RequestBody MatchStateDTO state) {
         Match match = findMatch(matchId);
-        matchService.updateState(match, state);
+        matchService.updateState(match, new MatchState(MatchState.State.valueOf(state.getState())));
     }
 
 }

@@ -1,10 +1,9 @@
 package com.match.management.server;
 
 import com.match.management.domain.TTTEvent;
-import com.match.management.domain.match.GameResult;
-import com.match.management.domain.match.MatchId;
-import com.match.management.domain.match.MatchRepository;
-import com.match.management.domain.match.Result;
+import com.google.gson.Gson;import com.match.management.domain.MatchStateChangedEvent;
+import com.match.management.domain.match.*;
+import com.match.management.infrastructure.web.MatchStateDTO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,7 @@ import reactor.bus.Event;
 import reactor.bus.EventBus;
 import reactor.fn.Consumer;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Collections.singletonList;
@@ -70,6 +70,32 @@ public class ApiMatchResourceTest {
     }
 
     @Test
+    public void updateState_Finished_Happy_Flow() throws Exception {
+        //prepare
+        AtomicReference<Object> catchEvents = new AtomicReference<>();
+        eventRepository.subscribe(catchEvents::set);
+        Result result = new Result(Arrays.asList(new GameResult(7, 11),
+                new GameResult(5, 11),
+                new GameResult(11, 9),
+                new GameResult(2, 11)));
+
+        //act
+        MatchStateDTO matchStateDto = MatchStateDTO.builder().state(MatchState.State.FINISHED.toString()).build();
+        String payload = new Gson().toJson(matchStateDto);
+
+        mvc.perform(put("/matches/0/state")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(payload))
+                .andExpect(status().isOk());
+
+        //assert
+        assertThat(matchRepository.findById(new MatchId(0)).getState().getValue())
+                .isEqualTo(MatchState.State.FINISHED);
+        assertThat(catchEvents.get()).isNotNull();
+        assertThat(catchEvents.get().getClass().equals(MatchStateChangedEvent.class));
+    }
+
+ @Test
     public void updateResult_validation_error() throws Exception {
         mvc.perform(put("/matches/0/result")
                 .contentType(MediaType.APPLICATION_JSON)
