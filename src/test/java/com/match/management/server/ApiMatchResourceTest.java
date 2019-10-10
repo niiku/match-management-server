@@ -46,14 +46,11 @@ public class ApiMatchResourceTest {
                 .andExpect(status().isOk());
     }
 
-    /*
-    // NOT YET IMPLEMENTED
     @Test
     public void getMatch_NotFound404() throws Exception {
         mvc.perform(get("/matches/104"))
                 .andExpect(status().is(404));
     }
-    */
 
     @Test
     public void updateResult_happy_flow() throws Exception {
@@ -70,5 +67,13 @@ public class ApiMatchResourceTest {
         assertThat(matchRepository.findById(new MatchId(0)).getResult())
                 .isEqualTo(result);
         assertThat(catchEvents.get()).isNotNull();
+    }
+
+    @Test
+    public void updateResult_validation_error() throws Exception {
+        mvc.perform(put("/matches/0/result")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"games\":[{\"score_player_a\":7,\"score_player_b\":8}]}"))
+                .andExpect(status().is(400));
     }
 }

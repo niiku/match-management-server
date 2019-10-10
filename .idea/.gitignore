@@ -6,3 +6,4 @@ modules.xml
 libraries/**
 /uiDesigner.xml
 shelf
+sonarlint/
