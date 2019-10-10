@@ -1,6 +1,6 @@
 package com.match.management.infrastructure.web;
 
-import com.match.management.domain.MatchAssignedToTableEvent;
+import com.match.management.domain.MatchAssignmentEvent;
 import com.match.management.domain.ResultUpdatedEvent;
 import com.match.management.domain.TTTEvent;
 import com.match.management.domain.match.MatchId;
@@ -40,8 +40,8 @@ public class TableWebSocketController implements Consumer<Event<TTTEvent>> {
     public void accept(Event<TTTEvent> event) {
         if (event.getData() instanceof ResultUpdatedEvent) {
             tableUpdate(((ResultUpdatedEvent)event.getData()).getMatchId());
-        } else if (event.getData() instanceof MatchAssignedToTableEvent) {
-            tableUpdate(((MatchAssignedToTableEvent)event.getData()).getTableId());
+        } else if (event.getData() instanceof MatchAssignmentEvent) {
+            tableUpdate(((MatchAssignmentEvent)event.getData()).getTableId());
         }
     }
 

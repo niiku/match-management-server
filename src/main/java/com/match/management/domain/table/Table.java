@@ -5,6 +5,7 @@ import com.match.management.domain.match.MatchId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -18,5 +19,17 @@ public class Table {
 
     public MatchId getActiveMatch() {
         return (matches == null || matches.isEmpty()) ? null : matches.get(0);
+    }
+
+    public boolean removeMatch(MatchId id) {
+        if (matches != null) {
+            return matches.remove(id);
+        }
+        return false;
+    }
+
+    public void addMatch(MatchId id) {
+        if(matches == null) matches = new ArrayList<>();
+        matches.add(id);
     }
 }
