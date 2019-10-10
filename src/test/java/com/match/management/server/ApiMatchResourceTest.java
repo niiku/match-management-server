@@ -65,37 +65,30 @@ public class ApiMatchResourceTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"games\":[{\"score_player_a\":7,\"score_player_b\":11}]}"))
                 .andExpect(status().isOk());
+
         assertThat(matchRepository.findById(new MatchId(0)).getResult())
                 .isEqualTo(result);
         await().atMost(5, TimeUnit.SECONDS).until(() -> catchEvents.get() != null);
-        assertThat(catchEvents.get().getClass().equals(ResultUpdatedEvent.class));
+        assertThat(catchEvents.get()).isInstanceOf(ResultUpdatedEvent.class);
     }
 
     @Test
     public void updateState_Finished_Happy_Flow() throws Exception {
-        //prepare
         AtomicReference<Object> catchEvents = new AtomicReference<>();
         Consumer<Event<TTTEvent>> eventconsumer = catchEvents::set;
         eventBus.on($(TTTEvent.class), eventconsumer);
 
-        Result result = new Result(Arrays.asList(new GameResult(7, 11),
-                new GameResult(5, 11),
-                new GameResult(11, 9),
-                new GameResult(2, 11)));
-
-        //act
         mvc.perform(put("/matches/0/state")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"state\" : \"FINISHED\"}"))
                 .andExpect(status().isOk());
 
-        //assert
         Match match = matchRepository.findById(new MatchId(0));
         assertThat(match.getState())
                 .isEqualTo(Match.State.FINISHED);
 
         await().atMost(5, TimeUnit.SECONDS).until(() -> catchEvents.get() != null);
-        assertThat(catchEvents.get().getClass().equals(MatchStateChangedEvent.class));
+        assertThat(catchEvents.get()).isInstanceOf(MatchStateChangedEvent.class);
     }
 
  @Test
