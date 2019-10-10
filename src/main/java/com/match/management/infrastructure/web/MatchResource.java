@@ -1,5 +1,6 @@
 package com.match.management.infrastructure.web;
 
+import com.match.management.application.InvalidResultException;
 import com.match.management.application.UpdateResultService;
 import com.match.management.domain.match.Match;
 import com.match.management.domain.match.MatchId;
@@ -23,7 +24,11 @@ public class MatchResource {
     @PutMapping(path = "{match_id}/result", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void updateResult(@PathVariable(name = "match_id") long matchId, @RequestBody ResultDTO result) {
         Match match = findMatch(matchId);
-        updateResultService.updateResult(match.getId(), ResultDTO.to(result));
+        try {
+            updateResultService.updateResult(match.getId(), ResultDTO.to(result));
+        } catch (InvalidResultException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getLocalizedMessage());
+        }
     }
 
     private Match findMatch(@PathVariable(name = "match_id") long matchId) {

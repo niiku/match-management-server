@@ -68,4 +68,12 @@ public class ApiMatchResourceTest {
                 .isEqualTo(result);
         assertThat(catchEvents.get()).isNotNull();
     }
+
+    @Test
+    public void updateResult_validation_error() throws Exception {
+        mvc.perform(put("/matches/0/result")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"games\":[{\"score_player_a\":7,\"score_player_b\":8}]}"))
+                .andExpect(status().is(400));
+    }
 }
