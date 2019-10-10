@@ -19,17 +19,14 @@ import java.util.stream.Collectors;
 public class TableDTO {
     private String tableId;
     private Integer tableManagerId;
-    @Deprecated
-    private MatchDTO currentMatch;
     private List<MatchDTO> matches;
 
     public static TableDTO from(Table table, Function<MatchId, Match> matchResolver) {
         return TableDTO.builder()
                 .tableId(table.getId().getValue())
                 .tableManagerId(table.getTableManagerId() == null ? null : table.getTableManagerId().getValue())
-                .currentMatch(MatchDTO.from(matchResolver.apply(table.getActiveMatch())))
                 .matches(table.getMatches().stream()
-                        .map(matchResolver::apply)
+                        .map(matchResolver)
                         .map(MatchDTO::from)
                         .collect(Collectors.toList()))
                 .build();

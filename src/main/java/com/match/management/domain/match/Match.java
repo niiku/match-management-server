@@ -2,23 +2,25 @@ package com.match.management.domain.match;
 
 import com.match.management.domain.ddd.Aggregate;
 import com.match.management.domain.ddd.AggregateId;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
 @Aggregate
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Match {
 
     public enum State {
+        ASSIGNED,
+        STARTED,
         FINISHED
     }
 
     @AggregateId
     private MatchId id;
 
-    private State state;
+    private State state = State.ASSIGNED;
     private Classification classification;
     private Stage stage;
     private Player playerA;
@@ -31,7 +33,7 @@ public class Match {
 
     public void setState(State state) {
         if(state == null) {
-            this.state = null;
+            this.state = State.ASSIGNED;
         } else {
             switch(state) { // used switch for any future state
                 case FINISHED:

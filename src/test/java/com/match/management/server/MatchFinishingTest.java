@@ -21,9 +21,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import reactor.bus.EventBus;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.awaitility.Awaitility.await;
 import static reactor.bus.selector.Selectors.$;
 
@@ -45,10 +47,10 @@ public class MatchFinishingTest {
     private MatchService matchService;
 
     @Autowired
-    EventBus eventBus;
+    private EventBus eventBus;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
 
     }
 
@@ -61,15 +63,19 @@ public class MatchFinishingTest {
 
         //given Match exist on table
         Table table = tableRepository.findTable(new TableId("1"));
-        Match activeMatch = matchRepository.findById(table.getActiveMatch());
-        matchService.updateResult(activeMatch,
+        Optional<Match> activeMatch = table.getMatches().stream()
+                .map(matchRepository::findById)
+                .filter(match -> match.getState() == Match.State.ASSIGNED)
+                .findFirst();
+        assertTrue(activeMatch.isPresent());
+        matchService.updateResult(activeMatch.get(),
                 new Result(Arrays.asList(new GameResult(7, 11),
                         new GameResult(5, 11),
                         new GameResult(11, 9),
                         new GameResult(2, 11))));
 
         //when: Match finished
-        matchService.updateState(activeMatch, Match.State.FINISHED);
+        matchService.updateState(activeMatch.get(), Match.State.FINISHED);
 
         //then: set current match on table to null and raise table event
         await().atMost(5, TimeUnit.SECONDS).until(() -> catchEvents.get() != null);

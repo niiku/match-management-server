@@ -38,7 +38,7 @@ public class TableRepositoryImpl implements TableRepository {
     @Override
     public Table findTable(MatchId matchId) {
         return getTables().stream()
-                .filter(t -> matchId.equals(t.getActiveMatch()))
+                .filter(t -> t.getMatches().contains(matchId))
                 .findFirst()
                 .orElse(null);
     }

@@ -39,7 +39,7 @@ public class MatchService {
 
     public void updateState(Match match, Match.State state) {
         match.setState(state);
-
+        matchRepository.save(match);
         eventBus.notify(TTTEvent.class, Event.wrap(new MatchStateChangedEvent(match.getId(), match.getState())));
     }
 }
