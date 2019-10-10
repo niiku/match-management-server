@@ -7,7 +7,9 @@ import com.match.management.domain.match.MatchId;
 import com.match.management.domain.table.Table;
 import lombok.*;
 
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -17,13 +19,19 @@ import java.util.function.Function;
 public class TableDTO {
     private String tableId;
     private Integer tableManagerId;
+    @Deprecated
     private MatchDTO currentMatch;
+    private List<MatchDTO> matches;
 
     public static TableDTO from(Table table, Function<MatchId, Match> matchResolver) {
         return TableDTO.builder()
                 .tableId(table.getId().getValue())
                 .tableManagerId(table.getTableManagerId() == null ? null : table.getTableManagerId().getValue())
                 .currentMatch(MatchDTO.from(matchResolver.apply(table.getActiveMatch())))
+                .matches(table.getMatches().stream()
+                        .map(matchResolver::apply)
+                        .map(MatchDTO::from)
+                        .collect(Collectors.toList()))
                 .build();
     }
 }
