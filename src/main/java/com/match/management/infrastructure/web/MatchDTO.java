@@ -40,7 +40,7 @@ public class MatchDTO {
     public static Match to(MatchDTO match) {
         return Match.builder()
                 .id(new MatchId(match.getMatchId()))
-                .state(StringUtils.isEmpty(match.state) ? null : Match.State.valueOf(match.state))
+                .state(StringUtils.isEmpty(match.state) ? Match.State.ASSIGNED : Match.State.valueOf(match.state))
                 .classification(new Classification(match.getClassification()))
                 .stage(new Stage(match.getStage()))
                 .playerA(PlayerDTO.to(match.getPlayerA()))
