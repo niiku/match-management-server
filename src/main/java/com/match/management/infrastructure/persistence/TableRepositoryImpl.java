@@ -18,7 +18,7 @@ public class TableRepositoryImpl implements TableRepository {
     @Override
     public List<Table> getTables() {
         ArrayList<Table> tables = new ArrayList<>(TableRepositoryImpl.tables.values());
-        tables.sort(Comparator.comparingInt(table -> Integer.parseInt(table.getId().getValue())));
+        tables.sort(Comparator.comparing(id -> String.format("%1$3s", id.getId())));
         return tables;
     }
 
