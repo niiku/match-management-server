@@ -1,7 +1,6 @@
 package com.match.management;
 
 import com.match.management.application.MatchService;
-import com.match.management.domain.TTTEvent;
 import com.match.management.domain.match.GameResult;
 import com.match.management.domain.match.MatchId;
 import com.match.management.domain.match.Result;
@@ -10,20 +9,15 @@ import com.match.management.domain.table.TableId;
 import com.match.management.domain.table.TableRepository;
 import com.match.management.infrastructure.web.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
-import reactor.bus.EventBus;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-import static reactor.bus.selector.Selectors.$;
-
 @Configuration
-public class TTTApplicationRunner implements ApplicationRunner {
+public class TTTApplicationRunner {
 
     @Autowired
     private MockingResource mockingResource;
@@ -34,20 +28,9 @@ public class TTTApplicationRunner implements ApplicationRunner {
     @Autowired
     private TableRepository tableRepository;
 
-    @Autowired
-    private EventBus eventBus;
-
-    @Autowired
-    private TableWebSocketController notificationConsumer;
-
-    @Override
-    public void run(ApplicationArguments args) {
-        eventBus.on($(TTTEvent.class), notificationConsumer);
-    }
-
     @EventListener
     public void initRepositoriesWithMockData(ApplicationStartedEvent event) {
-        for(int i = 0; i < 15; i++) {
+        for (int i = 0; i < 15; i++) {
             mockingResource.postEvent(ExternalEventDTO.builder()
                     .id(ExternalEventId.MATCHES_ASSIGNED_TO_TABLE)
                     .payload(EventPayloadDTO.builder()
