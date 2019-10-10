@@ -31,7 +31,7 @@ public class TTTApplicationRunner {
 
     @EventListener
     public void initRepositoriesWithMockData(ApplicationStartedEvent event) {
-        for (int i = 0; i < 15; i++) {
+        for (int i = 1; i < 26; i++) {
             mockingResource.postEvent(ExternalEventDTO.builder()
                     .id(ExternalEventId.MATCHES_ASSIGNED_TO_TABLE)
                     .payload(EventPayloadDTO.builder()
@@ -86,7 +86,7 @@ public class TTTApplicationRunner {
         tableRepository.save(Table.builder().id(new TableId("15")).build());
 
         matchService.updateResult(
-                new MatchId(0),
+                new MatchId(10),
                 new Result(Arrays.asList(
                         new GameResult(8, 11),
                         new GameResult(12, 10),
