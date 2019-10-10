@@ -2,6 +2,7 @@ package com.match.management;
 
 import com.match.management.application.MatchService;
 import com.match.management.domain.match.GameResult;
+import com.match.management.domain.match.Match;
 import com.match.management.domain.match.MatchId;
 import com.match.management.domain.match.Result;
 import com.match.management.domain.table.Table;
@@ -93,6 +94,7 @@ public class TTTApplicationRunner {
                         new GameResult(11, 0)
                 ))
         );
+        matchService.updateState(new MatchId(0), Match.State.FINISHED);
 
     }
 

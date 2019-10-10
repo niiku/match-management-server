@@ -3,6 +3,7 @@ package com.match.management.application;
 import com.match.management.domain.MatchAssignmentEvent;
 import com.match.management.domain.MatchStateChangedEvent;
 import com.match.management.domain.TTTEvent;
+import com.match.management.domain.match.Match;
 import com.match.management.domain.match.MatchRepository;
 import com.match.management.domain.table.Table;
 import com.match.management.domain.table.TableRepository;
@@ -38,7 +39,9 @@ public class DomainEventHandler {
 
     private void handleMatchStateChangedEvent(MatchStateChangedEvent event) {
         Table table = tableRepository.findTable(event.getMatchId());
-        table.removeMatch(event.getMatchId());
+        if( event.getState() == Match.State.FINISHED) {
+            table.removeMatch(event.getMatchId());
+        }
         eventBus.notify(TTTEvent.class, Event.wrap(new MatchAssignmentEvent(table.getId())));
     }
 }
