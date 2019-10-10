@@ -40,7 +40,7 @@ public class UpdateResultServiceTest {
         GameResult gameResult = new GameResult(-1, 11);
         result.getGames().add(gameResult);
 
-        thrown.expect(InvalidGameResultException.class);
+        thrown.expect(InvalidResultException.class);
 
         updateResultService.updateResult(new MatchId(0), result);
     }
@@ -50,7 +50,7 @@ public class UpdateResultServiceTest {
         GameResult gameResult = new GameResult(9, 5);
         result.getGames().add(gameResult);
 
-        thrown.expect(InvalidGameResultException.class);
+        thrown.expect(InvalidResultException.class);
 
         updateResultService.updateResult(new MatchId(0), result);
     }
