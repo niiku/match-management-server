@@ -16,7 +16,7 @@ public class MatchService {
     MatchRepository matchRepository;
 
     @Autowired
-    private EventBus eventBus;
+    EventBus eventBus;
 
     public void updateResult(MatchId matchId, Result result) {
         Match match = matchRepository.findById(matchId);
@@ -29,7 +29,7 @@ public class MatchService {
         }
         match.updateResult(result);
 
-        eventRepository.publishEvent(new ResultUpdatedEvent(match.getId()));
+        eventBus.notify(TTTEvent.class, Event.wrap(new ResultUpdatedEvent(match.getId())));
     }
 
     public void updateState(MatchId matchId, MatchState state) {
@@ -40,6 +40,6 @@ public class MatchService {
     public void updateState(Match match, MatchState state) {
         match.setState(state);
 
-        eventRepository.publishEvent(new MatchStateChangedEvent(match.getId(), match.getState()));
+        eventBus.notify(TTTEvent.class, Event.wrap(new MatchStateChangedEvent(match.getId(), match.getState())));
     }
 }

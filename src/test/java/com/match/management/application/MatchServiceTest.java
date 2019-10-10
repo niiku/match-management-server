@@ -1,12 +1,12 @@
 package com.match.management.application;
 
 
-import com.match.management.domain.EventRepository;
 import com.match.management.domain.match.*;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import reactor.bus.EventBus;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +33,7 @@ public class MatchServiceTest {
         matchService.matchRepository = mock(MatchRepository.class);
         when(matchService.matchRepository.findById(any()))
                 .thenReturn(match);
-        matchService.eventRepository =  mock(EventRepository.class);
+        matchService.eventBus =  mock(EventBus.class);
     }
 
     @Test()

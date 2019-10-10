@@ -73,7 +73,9 @@ public class ApiMatchResourceTest {
     public void updateState_Finished_Happy_Flow() throws Exception {
         //prepare
         AtomicReference<Object> catchEvents = new AtomicReference<>();
-        eventRepository.subscribe(catchEvents::set);
+        Consumer<Event<TTTEvent>> eventconsumer = catchEvents::set;
+        eventBus.on($(TTTEvent.class), eventconsumer);
+
         Result result = new Result(Arrays.asList(new GameResult(7, 11),
                 new GameResult(5, 11),
                 new GameResult(11, 9),
