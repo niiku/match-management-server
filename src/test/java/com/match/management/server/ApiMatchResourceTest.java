@@ -46,14 +46,11 @@ public class ApiMatchResourceTest {
                 .andExpect(status().isOk());
     }
 
-    /*
-    // NOT YET IMPLEMENTED
     @Test
     public void getMatch_NotFound404() throws Exception {
         mvc.perform(get("/matches/104"))
                 .andExpect(status().is(404));
     }
-    */
 
     @Test
     public void updateResult_happy_flow() throws Exception {
