@@ -1,10 +1,9 @@
 package com.match.management.server;
 
-import com.google.gson.Gson;
 import com.match.management.domain.MatchStateChangedEvent;
+import com.match.management.domain.ResultUpdatedEvent;
 import com.match.management.domain.TTTEvent;
 import com.match.management.domain.match.*;
-import com.match.management.infrastructure.web.MatchStateDTO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,14 +61,14 @@ public class ApiMatchResourceTest {
         eventBus.on($(TTTEvent.class), eventconsumer);
 
         Result result = new Result(singletonList(new GameResult(7, 11)));
-        // TODO: create json programmatically
         mvc.perform(put("/matches/0/result")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"games\":[{\"score_player_a\":7,\"score_player_b\":11}]}"))
                 .andExpect(status().isOk());
         assertThat(matchRepository.findById(new MatchId(0)).getResult())
                 .isEqualTo(result);
-        assertThat(catchEvents.get()).isNotNull();
+        await().atMost(5, TimeUnit.SECONDS).until(() -> catchEvents.get() != null);
+        assertThat(catchEvents.get().getClass().equals(ResultUpdatedEvent.class));
     }
 
     @Test
@@ -85,17 +84,15 @@ public class ApiMatchResourceTest {
                 new GameResult(2, 11)));
 
         //act
-        MatchStateDTO matchStateDto = MatchStateDTO.builder().state(MatchState.State.FINISHED.toString()).build();
-        String payload = new Gson().toJson(matchStateDto);
-
         mvc.perform(put("/matches/0/state")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(payload))
+                .content("{\"state\" : \"FINISHED\"}"))
                 .andExpect(status().isOk());
 
         //assert
-        assertThat(matchRepository.findById(new MatchId(0)).getState().getValue())
-                .isEqualTo(MatchState.State.FINISHED);
+        Match match = matchRepository.findById(new MatchId(0));
+        assertThat(match.getState())
+                .isEqualTo(Match.State.FINISHED);
 
         await().atMost(5, TimeUnit.SECONDS).until(() -> catchEvents.get() != null);
         assertThat(catchEvents.get().getClass().equals(MatchStateChangedEvent.class));

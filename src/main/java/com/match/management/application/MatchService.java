@@ -32,12 +32,12 @@ public class MatchService {
         eventBus.notify(TTTEvent.class, Event.wrap(new ResultUpdatedEvent(match.getId())));
     }
 
-    public void updateState(MatchId matchId, MatchState state) {
+    public void updateState(MatchId matchId, Match.State state) {
         Match match = matchRepository.findById(matchId);
         updateState(match, state);
     }
 
-    public void updateState(Match match, MatchState state) {
+    public void updateState(Match match, Match.State state) {
         match.setState(state);
 
         eventBus.notify(TTTEvent.class, Event.wrap(new MatchStateChangedEvent(match.getId(), match.getState())));

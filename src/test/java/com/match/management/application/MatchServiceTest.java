@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 
 public class MatchServiceTest {
 
-    private final Match match = new Match(new MatchId(0), null, null, null, null, null);
+    private final Match match = new Match(new MatchId(0), null, null, null, null, null, null);
 
     private Result result;
 
@@ -27,7 +27,7 @@ public class MatchServiceTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         result = new Result(new ArrayList<>());
         matchService = new MatchService();
         matchService.matchRepository = mock(MatchRepository.class);
@@ -65,7 +65,7 @@ public class MatchServiceTest {
                         new GameResult(2, 11)));
         match.updateResult(result);
 
-        matchService.updateState(match, new MatchState(MatchState.State.FINISHED));
+        matchService.updateState(match, Match.State.FINISHED);
     }
 
     @Test
@@ -77,13 +77,13 @@ public class MatchServiceTest {
 
         thrown.expect(IllegalStateException.class);
 
-        matchService.updateState(match, new MatchState(MatchState.State.FINISHED));
+        matchService.updateState(match, Match.State.FINISHED);
     }
 
     @Test
     public void setState_Finished_NotResults() {
         thrown.expect(IllegalStateException.class);
 
-        matchService.updateState(match, new MatchState(MatchState.State.FINISHED));
+        matchService.updateState(match, Match.State.FINISHED);
     }
 }

@@ -10,10 +10,14 @@ import lombok.Getter;
 @AllArgsConstructor
 public class Match {
 
+    public enum State {
+        FINISHED
+    }
+
     @AggregateId
     private MatchId id;
 
-    private MatchState state;
+    private State state;
     private Classification classification;
     private Stage stage;
     private Player playerA;
@@ -24,11 +28,11 @@ public class Match {
         this.result = result;
     }
 
-    public void setState(MatchState state) {
+    public void setState(State state) {
         if(state == null) {
             this.state = null;
         } else {
-            switch(state.getValue()) { // used switch for any future state
+            switch(state) { // used switch for any future state
                 case FINISHED:
                     validateFinishState();
                 default:

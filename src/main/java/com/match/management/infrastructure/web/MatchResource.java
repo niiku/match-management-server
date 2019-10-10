@@ -5,7 +5,6 @@ import com.match.management.application.MatchService;
 import com.match.management.domain.match.Match;
 import com.match.management.domain.match.MatchId;
 import com.match.management.domain.match.MatchRepository;
-import com.match.management.domain.match.MatchState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,7 +25,7 @@ public class MatchResource {
     public void updateResult(@PathVariable(name = "match_id") long matchId, @RequestBody ResultDTO result) {
         Match match = findMatch(matchId);
         try {
-            updateResultService.updateResult(match.getId(), ResultDTO.to(result));
+            matchService.updateResult(match.getId(), ResultDTO.to(result));
         } catch (InvalidResultException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getLocalizedMessage());
         }
@@ -48,7 +47,7 @@ public class MatchResource {
     @PutMapping(path = "{match_id}/state", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void updateState(@PathVariable(name = "match_id") long matchId, @RequestBody MatchStateDTO state) {
         Match match = findMatch(matchId);
-        matchService.updateState(match, new MatchState(MatchState.State.valueOf(state.getState())));
+        matchService.updateState(match, Match.State.valueOf(state.getState()));
     }
 
 }

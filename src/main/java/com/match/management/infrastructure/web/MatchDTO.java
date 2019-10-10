@@ -7,6 +7,7 @@ import com.match.management.domain.match.Match;
 import com.match.management.domain.match.MatchId;
 import com.match.management.domain.match.Stage;
 import lombok.*;
+import org.springframework.util.StringUtils;
 
 @Data
 @Builder
@@ -17,6 +18,7 @@ public class MatchDTO {
 
     private long matchId;
     private String classification;
+    private String state;
     private String stage;
     private PlayerDTO playerA;
     private PlayerDTO playerB;
@@ -26,7 +28,7 @@ public class MatchDTO {
         if (match == null) return null;
         return MatchDTO.builder()
                 .matchId(match.getId().getValue())
-                .state(MatchStateDTO.builder().state(match.getState().getValue() != null ? match.getState().getValue().toString() : null).build())
+                .state(match.getState() != null ? match.getState().toString() : null)
                 .classification(match.getClassification().getValue())
                 .stage(match.getStage().getValue())
                 .playerA(PlayerDTO.from(match.getPlayerA()))
@@ -38,7 +40,7 @@ public class MatchDTO {
     public static Match to(MatchDTO match) {
         return new Match(
                 new MatchId(match.getMatchId()),
-                new MatchState((match.state != null) ? MatchState.State.valueOf(match.state.getState()) : null),
+                StringUtils.isEmpty(match.state) ? null : Match.State.valueOf(match.state),
                 new Classification(match.getClassification()),
                 new Stage(match.getStage()),
                 PlayerDTO.to(match.getPlayerA()),

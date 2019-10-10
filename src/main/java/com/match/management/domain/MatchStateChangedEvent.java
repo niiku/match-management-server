@@ -1,7 +1,7 @@
 package com.match.management.domain;
 
+import com.match.management.domain.match.Match;
 import com.match.management.domain.match.MatchId;
-import com.match.management.domain.match.MatchState;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,5 +9,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class MatchStateChangedEvent implements TTTEvent {
     private MatchId matchId;
-    private MatchState state;
+    private Match.State state;
 }
