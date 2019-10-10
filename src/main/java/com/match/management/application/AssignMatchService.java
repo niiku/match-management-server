@@ -1,8 +1,9 @@
 package com.match.management.application;
 
-import com.match.management.domain.MatchAssignedToTableEvent;
 import com.match.management.domain.TTTEvent;
+import com.match.management.domain.MatchAssignmentEvent;
 import com.match.management.domain.match.Match;
+import com.match.management.domain.match.MatchId;
 import com.match.management.domain.match.MatchRepository;
 import com.match.management.domain.table.Table;
 import com.match.management.domain.table.TableId;
@@ -11,6 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.bus.Event;
 import reactor.bus.EventBus;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class AssignMatchService {
@@ -23,18 +28,39 @@ public class AssignMatchService {
     @Autowired
     EventBus eventBus;
 
-    public void assignMatchToTable(Match match, TableId tableId) {
+    public void assignMatchesToTable(List<Match> matches, TableId tableId) {
         // TODO: validation?
 
-        matchRepository.save(match);
+        Set<TableId> updatedTables = new HashSet<>();
+
+        // Remove matches from previous tables
+        for(Match match : matches) {
+            Table otherTable = tableRepository.findTable(match.getId());
+            if(otherTable != null && otherTable.removeMatch(match.getId())) {
+                tableRepository.save(otherTable);
+                updatedTables.add(otherTable.getId());
+            }
+        }
+
+        // Create new empty table or clear existing
         Table table = tableRepository.findTable(tableId);
         if (table == null) {
-            table = new Table(tableId, null, match.getId());
+            table = new Table(tableId, null, null);
         } else {
-            table.setActiveMatch(match.getId());
+            for(MatchId matchId : table.getMatches()) {
+                matchRepository.remove(matchId);
+            }
+        }
+
+        // Add new matches
+        for(Match match : matches) {
+            matchRepository.save(match);
+            table.addMatch(match.getId());
         }
         tableRepository.save(table);
+        updatedTables.add(table.getId());
 
-        eventBus.notify(TTTEvent.class, Event.wrap(new MatchAssignedToTableEvent(tableId, match.getId())));
+        // Send events for all updated tables
+        updatedTables.forEach(t -> eventBus.notify(TTTEvent.class, Event.wrap(new MatchAssignmentEvent(t))));
     }
 }

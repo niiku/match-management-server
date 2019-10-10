@@ -22,4 +22,9 @@ public class MatchRespositoryImpl implements MatchRepository {
         matches.put(match.getId(), match);
     }
 
+    @Override
+    public void remove(MatchId matchId) {
+        matches.remove(matchId);
+    }
+
 }

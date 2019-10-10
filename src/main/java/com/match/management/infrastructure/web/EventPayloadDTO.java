@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -11,5 +13,5 @@ import lombok.*;
 @JsonNaming(SnakeCaseStrategy.class)
 public class EventPayloadDTO {
     private String tableId;
-    private MatchDTO match;
+    private List<MatchDTO> matches;
 }

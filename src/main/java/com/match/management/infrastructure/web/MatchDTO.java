@@ -21,6 +21,7 @@ public class MatchDTO {
     private ResultDTO result;
 
     public static MatchDTO from(Match match) {
+        if (match == null) return null;
         return MatchDTO.builder()
                 .matchId(match.getId().getValue())
                 .classification(match.getClassification().getValue())

@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping(
         value = "/mocking",
@@ -23,9 +26,11 @@ public class MockingResource {
 
     @PostMapping("events")
     public void postEvent(@RequestBody ExternalEventDTO event) {
-        assert event.getId() == ExternalEventId.MATCH_ASSIGNED_TO_TABLE;
-        Match match = MatchDTO.to(event.getPayload().getMatch());
+        assert event.getId() == ExternalEventId.MATCHES_ASSIGNED_TO_TABLE;
+        List<Match> matches = event.getPayload().getMatches().stream()
+                .map(MatchDTO::to)
+                .collect(Collectors.toList());
         TableId tableId = new TableId(event.getPayload().getTableId());
-        assignMatchService.assignMatchToTable(match, tableId);
+        assignMatchService.assignMatchesToTable(matches, tableId);
     }
 }
