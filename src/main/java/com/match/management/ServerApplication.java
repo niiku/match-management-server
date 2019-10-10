@@ -82,7 +82,7 @@ public class ServerApplication implements CommandLineRunner {
                         .matches(Arrays.asList(
                                 MatchDTO.builder()
                                     .matchId(i * 10)
-                                    .classification("classification x")
+                                    .classification("Herren A")
                                     .stage("Gruppe " + i)
                                     .playerA(PlayerDTO.builder()
                                             .playerId(i * 100)
@@ -102,7 +102,7 @@ public class ServerApplication implements CommandLineRunner {
                                     .build(),
                                     MatchDTO.builder()
                                         .matchId(i * 10 + 5)
-                                        .classification("classification x")
+                                        .classification("Herren A")
                                         .stage("Gruppe " + i)
                                         .playerA(PlayerDTO.builder()
                                                 .playerId(i * 100 + 50)
