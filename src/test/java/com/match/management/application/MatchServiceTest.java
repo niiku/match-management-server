@@ -65,7 +65,7 @@ public class MatchServiceTest {
                         new GameResult(2, 11)));
         match.updateResult(result);
 
-        match.setState(new MatchState(MatchState.State.FINISHED));
+        matchService.updateState(match, new MatchState(MatchState.State.FINISHED));
     }
 
     @Test
@@ -77,13 +77,13 @@ public class MatchServiceTest {
 
         thrown.expect(IllegalStateException.class);
 
-        match.setState(new MatchState(MatchState.State.FINISHED));
+        matchService.updateState(match, new MatchState(MatchState.State.FINISHED));
     }
 
     @Test
     public void setState_Finished_NotResults() {
         thrown.expect(IllegalStateException.class);
 
-        match.setState(new MatchState(MatchState.State.FINISHED));
+        matchService.updateState(match, new MatchState(MatchState.State.FINISHED));
     }
 }
