@@ -1,6 +1,7 @@
 package com.match.management;
 
 import com.match.management.application.UpdateResultService;
+import com.match.management.domain.TTTEvent;
 import com.match.management.domain.match.GameResult;
 import com.match.management.domain.match.MatchId;
 import com.match.management.domain.match.Result;
@@ -8,39 +9,63 @@ import com.match.management.infrastructure.web.*;
 import io.swagger.v3.oas.models.OpenAPI;
 import org.springdoc.api.OpenApiCustomiser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import reactor.bus.EventBus;
 
 import java.util.Arrays;
 import java.util.Collections;
 
+import reactor.Environment;
+
+import static reactor.bus.selector.Selectors.$;
+
 @SpringBootApplication
 @EnableScheduling
-public class ServerApplication {
+public class ServerApplication implements CommandLineRunner {
 
     @Autowired
-    MockingResource mockingResource;
+    private MockingResource mockingResource;
 
     @Autowired
-    UpdateResultService updateResultService;
+    private UpdateResultService updateResultService;
+
+    @Autowired
+    private EventBus eventBus;
+
+    @Autowired
+    private TableWebSocketController notificationConsumer;
+
+    @Override
+    public void run(String... args) {
+        eventBus.on($(TTTEvent.class), notificationConsumer);
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(ServerApplication.class, args);
     }
 
     @Bean
+    Environment env() {
+        return Environment.initializeIfEmpty().assignErrorJournal();
+    }
+
+    @Bean
+    EventBus createEventBus(Environment env) {
+        return EventBus.create(env, Environment.THREAD_POOL);
+    }
+
+    @Bean
     public OpenApiCustomiser customize() {
-        return new OpenApiCustomiser() {
-            @Override
-            public void customise(OpenAPI openAPI) {
-                String url = openAPI.getServers().get(0).getUrl();
-                if (isOpenShiftTTTUrl(url)) {
-                    openAPI.getServers().get(0).setUrl("https:" + url.substring(5));
-                }
+        return openAPI -> {
+            String url = openAPI.getServers().get(0).getUrl();
+            if (isOpenShiftTTTUrl(url)) {
+                openAPI.getServers().get(0).setUrl("https:" + url.substring(5));
             }
         };
     }
