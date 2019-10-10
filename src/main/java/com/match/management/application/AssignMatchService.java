@@ -20,13 +20,13 @@ import java.util.Set;
 @Service
 public class AssignMatchService {
     @Autowired
-    TableRepository tableRepository;
+    private TableRepository tableRepository;
 
     @Autowired
-    MatchRepository matchRepository;
+    private MatchRepository matchRepository;
 
     @Autowired
-    EventBus eventBus;
+    private EventBus eventBus;
 
     public void assignMatchesToTable(List<Match> matches, TableId tableId) {
         // TODO: validation?
@@ -45,7 +45,7 @@ public class AssignMatchService {
         // Create new empty table or clear existing
         Table table = tableRepository.findTable(tableId);
         if (table == null) {
-            table = new Table(tableId, null, null);
+            table = Table.builder().id(tableId).build();
         } else {
             for(MatchId matchId : table.getMatches()) {
                 matchRepository.remove(matchId);

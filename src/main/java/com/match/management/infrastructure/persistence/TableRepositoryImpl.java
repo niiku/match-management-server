@@ -31,14 +31,14 @@ public class TableRepositoryImpl implements TableRepository {
     @Override
     public List<Table> findTables(TableManagerId tableManagerId) {
         return getTables().stream()
-                .filter(t -> t.getTableManagerId().equals(tableManagerId))
+                .filter(t -> tableManagerId.equals(t.getTableManagerId()))
                 .collect(Collectors.toList());
     }
 
     @Override
     public Table findTable(MatchId matchId) {
         return getTables().stream()
-                .filter(t -> t.getActiveMatch().equals(matchId))
+                .filter(t -> matchId.equals(t.getActiveMatch()))
                 .findFirst()
                 .orElse(null);
     }
