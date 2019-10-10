@@ -1,7 +1,7 @@
 package com.match.management.infrastructure.web;
 
 import com.match.management.application.InvalidResultException;
-import com.match.management.application.UpdateResultService;
+import com.match.management.application.MatchService;
 import com.match.management.domain.match.Match;
 import com.match.management.domain.match.MatchId;
 import com.match.management.domain.match.MatchRepository;
@@ -19,13 +19,13 @@ public class MatchResource {
     MatchRepository matchRepository;
 
     @Autowired
-    UpdateResultService updateResultService;
+    MatchService matchService;
 
     @PutMapping(path = "{match_id}/result", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void updateResult(@PathVariable(name = "match_id") long matchId, @RequestBody ResultDTO result) {
         Match match = findMatch(matchId);
         try {
-            updateResultService.updateResult(match.getId(), ResultDTO.to(result));
+            matchService.updateResult(match.getId(), ResultDTO.to(result));
         } catch (InvalidResultException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getLocalizedMessage());
         }
@@ -42,6 +42,12 @@ public class MatchResource {
     @GetMapping(path = "{match_id}")
     public MatchDTO getMatch(@PathVariable(name = "match_id") long matchId) {
         return MatchDTO.from(findMatch(matchId));
+    }
+
+    @PutMapping(path = "{match_id}/state", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void updateState(@PathVariable(name = "match_id") long matchId, @RequestBody MatchStateDTO state) {
+        Match match = findMatch(matchId);
+        matchService.updateState(match, Match.State.valueOf(state.getState()));
     }
 
 }
