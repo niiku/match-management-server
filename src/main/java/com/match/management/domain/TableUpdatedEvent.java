@@ -6,6 +6,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class MatchAssignmentEvent implements TTTEvent {
+public class TableUpdatedEvent implements TTTEvent {
     private TableId tableId;
 }

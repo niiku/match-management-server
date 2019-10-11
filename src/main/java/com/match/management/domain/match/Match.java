@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Getter
 @Aggregate
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Match {
 
@@ -33,18 +32,15 @@ public class Match {
         this.result = result;
     }
 
-    public void setState(State state) {
-        if(state == null) {
-            this.state = State.ASSIGNED;
-        } else {
-            switch(state) { // used switch for any future state
-                case FINISHED:
-                    validateFinishState();
-                case ASSIGNED:
-                default:
-                    this.state = state;
-            }
-        }
+    public Match finish() {
+        this.result.assertResultIsComplete();
+        state = State.FINISHED;
+        return this;
+    }
+
+    public Match start() {
+        state = State.STARTED;
+        return this;
     }
 
     public void incrementPlayerACallCount() {
@@ -59,16 +55,7 @@ public class Match {
         return new CallCount(cca == null ? 1 : cca.getValue() + 1, LocalDateTime.now());
     }
 
-    /**
-     * @throws IllegalStateException in case of any invalid result
-     */
-    private void validateFinishState() {
-        if (this.result == null || this.result.getGames() == null || this.result.getGames().isEmpty()) {
-            throw new IllegalStateException("Match without result cannot be set to finished");
-        }
-        if ( Math.max(result.getGamesWonPlayerA(), result.getGamesWonPlayerB()) < 3) {
-            throw new IllegalStateException("Match without 3 won games by any player cannot be set to finished");
-        }
+    public boolean isStarted() {
+        return this.state == State.STARTED;
     }
-
 }

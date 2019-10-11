@@ -1,8 +1,7 @@
 package com.match.management.server;
 
-import com.match.management.domain.MatchStateChangedEvent;
+import com.match.management.domain.MatchFinishedEvent;
 import com.match.management.domain.ResultUpdatedEvent;
-import com.match.management.domain.TTTEvent;
 import com.match.management.domain.match.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,11 +55,7 @@ public class ApiMatchResourceTest {
     @Test
     public void updateResult_happy_flow() throws Exception {
         List<Event> catchEvents = new ArrayList<>();
-        eventBus.on($(TTTEvent.class), event -> {
-            if(event.getData() instanceof ResultUpdatedEvent) {
-                catchEvents.add(event);
-            }
-        });
+        eventBus.on($(ResultUpdatedEvent.class), catchEvents::add);
 
         Result result = new Result(singletonList(new GameResult(7, 11)));
         mvc.perform(put("/matches/10/result")
@@ -77,11 +72,7 @@ public class ApiMatchResourceTest {
     @Test
     public void updateState_Finished_Happy_Flow() throws Exception {
         List<Event> catchEvents = new ArrayList<>();
-        eventBus.on($(TTTEvent.class), event -> {
-            if(event.getData() instanceof MatchStateChangedEvent) {
-                catchEvents.add(event);
-            }
-        });
+        eventBus.on($(MatchFinishedEvent.class), catchEvents::add);
 
         mvc.perform(put("/matches/10/state")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -93,7 +84,6 @@ public class ApiMatchResourceTest {
                 .isEqualTo(Match.State.FINISHED);
 
         await().atMost(5, TimeUnit.SECONDS).until(() -> !catchEvents.isEmpty());
-        assertThat(catchEvents.get(0).getData()).isInstanceOf(MatchStateChangedEvent.class);
     }
 
  @Test

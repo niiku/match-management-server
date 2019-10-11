@@ -1,10 +1,9 @@
 package com.match.management.application;
 
-import com.match.management.domain.MatchAssignmentEvent;
-import com.match.management.domain.MatchStateChangedEvent;
-import com.match.management.domain.TTTEvent;
-import com.match.management.domain.match.Match;
-import com.match.management.domain.match.MatchRepository;
+import com.match.management.domain.TableUpdatedEvent;
+import com.match.management.domain.MatchFinishedEvent;
+import com.match.management.domain.MatchStartedEvent;
+import com.match.management.domain.match.MatchId;
 import com.match.management.domain.table.Table;
 import com.match.management.domain.table.TableRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,20 +26,23 @@ public class DomainEventHandler {
 
     @PostConstruct
     void postConstruct() {
-        eventBus.on($(TTTEvent.class), event -> this.handle((TTTEvent) event.getData()));
+        eventBus.on($(MatchFinishedEvent.class), event -> this.handle((MatchFinishedEvent) event.getData()));
+        eventBus.on($(MatchStartedEvent.class), event -> this.handle((MatchStartedEvent) event.getData()));
     }
 
-    private void handle(TTTEvent event) {
-        if (event instanceof MatchStateChangedEvent) {
-            handleMatchStateChangedEvent((MatchStateChangedEvent) event);
-        }
+    private void handle(MatchFinishedEvent event) {
+        MatchId finishedMatchId = event.getMatchId();
+        Table table = tableRepository.findTable(finishedMatchId);
+        table.removeMatch(finishedMatchId);
+        notifyAboutTableChange(table);
     }
 
-    private void handleMatchStateChangedEvent(MatchStateChangedEvent event) {
+    private void handle(MatchStartedEvent event) {
         Table table = tableRepository.findTable(event.getMatchId());
-        if( event.getState() == Match.State.FINISHED) {
-            table.removeMatch(event.getMatchId());
-        }
-        eventBus.notify(TTTEvent.class, Event.wrap(new MatchAssignmentEvent(table.getId())));
+        notifyAboutTableChange(table);
+    }
+
+    private void notifyAboutTableChange(Table table) {
+        eventBus.notify(TableUpdatedEvent.class, Event.wrap(new TableUpdatedEvent(table.getId())));
     }
 }

@@ -1,7 +1,7 @@
 package com.match.management.server;
 
 import com.match.management.application.MatchService;
-import com.match.management.domain.MatchStateChangedEvent;
+import com.match.management.domain.MatchFinishedEvent;
 import com.match.management.domain.TTTEvent;
 import com.match.management.domain.match.GameResult;
 import com.match.management.domain.match.Match;
@@ -17,10 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
+import reactor.bus.Event;
 import reactor.bus.EventBus;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -33,9 +35,6 @@ import static reactor.bus.selector.Selectors.$;
 @SpringBootTest
 @AutoConfigureMockMvc
 public class MatchFinishingTest {
-
-    @Autowired
-    private MockMvc mvc;
 
     @Autowired
     private TableRepository tableRepository;
@@ -56,28 +55,28 @@ public class MatchFinishingTest {
 
     @Test
     public void matchFinished_AssignNull_HappyFlow() {
-        AtomicReference<Object> catchEvents = new AtomicReference<>();
-        eventBus.on($(TTTEvent.class), e -> {
-            if (e.getData() instanceof MatchStateChangedEvent) catchEvents.set(e.getData());
-        });
+        List<Event> catchEvents = new ArrayList<>();
+        eventBus.on($(MatchFinishedEvent.class), catchEvents::add);
 
-        //given Match exist on table
         Table table = tableRepository.findTable(new TableId("1"));
         Optional<Match> activeMatch = table.getMatches().stream()
                 .map(matchRepository::findById)
                 .filter(match -> match.getState() == Match.State.ASSIGNED)
                 .findFirst();
         assertTrue(activeMatch.isPresent());
-        matchService.updateResult(activeMatch.get(),
+        matchService.updateResult(activeMatch.get().getId(),
                 new Result(Arrays.asList(new GameResult(7, 11),
                         new GameResult(5, 11),
                         new GameResult(11, 9),
                         new GameResult(2, 11))));
 
-        //when: Match finished
-        matchService.updateState(activeMatch.get(), Match.State.FINISHED);
+        matchService.finish(activeMatch.get().getId());
 
-        //then: set current match on table to null and raise table event
-        await().atMost(5, TimeUnit.SECONDS).until(() -> catchEvents.get() != null);
+        await().atMost(5, TimeUnit.SECONDS).until(() -> !catchEvents.isEmpty());
+    }
+
+    @Test
+    public void matchFinished_playerBWonByDefault_matchIsWonByDefaultByPlayerB() {
+//        matchService.finish(currentMatchId);
     }
 }

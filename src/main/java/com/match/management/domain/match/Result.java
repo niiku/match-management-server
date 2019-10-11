@@ -2,14 +2,16 @@ package com.match.management.domain.match;
 
 import lombok.Value;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Value
 public final class Result {
     private final List<GameResult> games;
 
+
+
     public int getGamesWonPlayerA() {
-        if(games == null) return 0;
         return (int)games.stream()
                 .filter(GameResult::isValid)
                 .filter(g -> g.getScorePlayerA() > g.getScorePlayerB())
@@ -17,7 +19,6 @@ public final class Result {
     }
 
     public int getGamesWonPlayerB() {
-        if(games == null) return 0;
         return (int)games.stream()
                 .filter(GameResult::isValid)
                 .filter(g -> g.getScorePlayerA() < g.getScorePlayerB())
@@ -25,6 +26,17 @@ public final class Result {
     }
 
     public boolean isValid() {
-        return games != null && games.stream().allMatch(GameResult::isValid);
+        return games.stream().allMatch(GameResult::isValid);
     }
+
+    public void assertResultIsComplete() {
+        if (getGames().isEmpty()) {
+            throw new IllegalStateException("Match without result cannot be set to finished");
+        }
+        if (Math.max(getGamesWonPlayerA(), getGamesWonPlayerB()) < 3) {
+            throw new IllegalStateException("Match without 3 won games by any player cannot be set to finished");
+        }
+    }
+    
+    
 }

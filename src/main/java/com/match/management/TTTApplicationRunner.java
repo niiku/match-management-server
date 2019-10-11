@@ -94,7 +94,7 @@ public class TTTApplicationRunner {
                         new GameResult(11, 0)
                 ))
         );
-        matchService.updateState(new MatchId(10), Match.State.FINISHED);
+        matchService.finish(new MatchId(10));
 
     }
 

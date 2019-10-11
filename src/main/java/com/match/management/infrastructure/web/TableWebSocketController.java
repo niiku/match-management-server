@@ -1,6 +1,6 @@
 package com.match.management.infrastructure.web;
 
-import com.match.management.domain.MatchAssignmentEvent;
+import com.match.management.domain.TableUpdatedEvent;
 import com.match.management.domain.ResultUpdatedEvent;
 import com.match.management.domain.TTTEvent;
 import com.match.management.domain.match.MatchId;
@@ -17,6 +17,7 @@ import reactor.fn.Consumer;
 import javax.annotation.PostConstruct;
 
 import static reactor.bus.selector.Selectors.$;
+import static reactor.bus.selector.Selectors.type;
 
 @Service
 public class TableWebSocketController implements Consumer<Event<TTTEvent>> {
@@ -35,7 +36,7 @@ public class TableWebSocketController implements Consumer<Event<TTTEvent>> {
 
     @PostConstruct
     public void init() {
-        eventBus.on($(TTTEvent.class), this);
+        eventBus.on(type(TTTEvent.class), this);
     }
 
     private void tableUpdate(MatchId matchId) {
@@ -53,8 +54,8 @@ public class TableWebSocketController implements Consumer<Event<TTTEvent>> {
     public void accept(Event<TTTEvent> event) {
         if (event.getData() instanceof ResultUpdatedEvent) {
             tableUpdate(((ResultUpdatedEvent) event.getData()).getMatchId());
-        } else if (event.getData() instanceof MatchAssignmentEvent) {
-            tableUpdate(((MatchAssignmentEvent) event.getData()).getTableId());
+        } else if (event.getData() instanceof TableUpdatedEvent) {
+            tableUpdate(((TableUpdatedEvent) event.getData()).getTableId());
         }
     }
 

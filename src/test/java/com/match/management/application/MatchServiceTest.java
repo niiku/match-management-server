@@ -16,8 +16,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,7 +44,8 @@ public class MatchServiceTest {
     public void setUp() {
         result = new Result(new ArrayList<>());
         matchService = new MatchService(matchRepositoryMock, tableRepositoryMock, mock(EventBus.class));
-        when(matchRepositoryMock.findById(any())).thenReturn(match);
+        when(matchRepositoryMock.findById(match.getId())).thenReturn(match);
+        when(tableRepositoryMock.findTable(match.getId())).thenReturn(Table.builder().build());
     }
 
     @Test()
@@ -74,7 +77,7 @@ public class MatchServiceTest {
                         new GameResult(2, 11)));
         match.updateResult(result);
 
-        matchService.updateState(match, Match.State.FINISHED);
+        matchService.finish(match.getId());
 
         Assert.assertSame(Match.State.FINISHED, match.getState());
     }
@@ -88,37 +91,46 @@ public class MatchServiceTest {
 
         thrown.expect(IllegalStateException.class);
 
-        matchService.updateState(match, Match.State.FINISHED);
+        matchService.finish(match.getId());
     }
 
     @Test
-    public void setState_Finished_NotResults() {
+    public void finishMatch_NoResultsYet_IllegalState() {
         thrown.expect(IllegalStateException.class);
 
-        matchService.updateState(match, Match.State.FINISHED);
+        Match matchWithoutResult = Match.builder().id(new MatchId(100)).result(new Result(emptyList())).build();
+        when(matchRepositoryMock.findById(matchWithoutResult.getId())).thenReturn(matchWithoutResult);
+        Table table = Table.builder().build();
+        table.addMatch(matchWithoutResult.getId());
+        when(tableRepositoryMock.findTable(matchWithoutResult.getId())).thenReturn(table);
+
+        matchService.finish(matchWithoutResult.getId());
     }
 
     @Test
     public void setState_Started_HappyCase() {
         when(tableRepositoryMock.findTable(match.getId())).thenReturn(Table.builder().id(new TableId("1")).build());
 
-        matchService.updateState(match, Match.State.STARTED);
+        matchService.start(match.getId());
 
         Assert.assertSame(Match.State.STARTED, match.getState());
     }
 
     @Test
-    public void setState_Started_Rejected() {
+    public void startMatch_otherMatchStarted_IllegalState() {
         Table table = Table.builder().id(new TableId("1")).build();
         table.getMatches().add(match.getId());
-        MatchId id = new MatchId(55);
-        Match match2 = Match.builder().id(id).state(Match.State.STARTED).build();
-        table.getMatches().add(match2.getId());
-        when(matchRepositoryMock.findById(id)).thenReturn(match2);
+
+        MatchId alreadyStartedMatchId = new MatchId(55);
+        Match alreadyStartedMatch = Match.builder().id(alreadyStartedMatchId).state(Match.State.STARTED).build();
+        table.getMatches().add(alreadyStartedMatch.getId());
+
+        when(matchRepositoryMock.findById(alreadyStartedMatchId)).thenReturn(alreadyStartedMatch);
         when(tableRepositoryMock.findTable(match.getId())).thenReturn(table);
 
         thrown.expect(IllegalStateException.class);
-        matchService.updateState(match, Match.State.STARTED);
+
+        matchService.start(match.getId());
     }
 
     @Test

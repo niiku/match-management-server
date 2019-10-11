@@ -7,7 +7,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class MatchStateChangedEvent implements TTTEvent {
+public class MatchStartedEvent implements TTTEvent {
     private MatchId matchId;
-    private Match.State state;
 }

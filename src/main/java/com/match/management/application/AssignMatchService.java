@@ -1,7 +1,6 @@
 package com.match.management.application;
 
-import com.match.management.domain.TTTEvent;
-import com.match.management.domain.MatchAssignmentEvent;
+import com.match.management.domain.TableUpdatedEvent;
 import com.match.management.domain.match.Match;
 import com.match.management.domain.match.MatchId;
 import com.match.management.domain.match.MatchRepository;
@@ -61,6 +60,6 @@ public class AssignMatchService {
         updatedTables.add(table.getId());
 
         // Send events for all updated tables
-        updatedTables.forEach(t -> eventBus.notify(TTTEvent.class, Event.wrap(new MatchAssignmentEvent(t))));
+        updatedTables.forEach(t -> eventBus.notify(TableUpdatedEvent.class, Event.wrap(new TableUpdatedEvent(t))));
     }
 }

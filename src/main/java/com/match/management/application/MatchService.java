@@ -1,8 +1,6 @@
 package com.match.management.application;
 
-import com.match.management.domain.MatchStateChangedEvent;
-import com.match.management.domain.ResultUpdatedEvent;
-import com.match.management.domain.TTTEvent;
+import com.match.management.domain.*;
 import com.match.management.domain.match.*;
 import com.match.management.domain.table.Table;
 import com.match.management.domain.table.TableRepository;
@@ -13,7 +11,7 @@ import reactor.bus.Event;
 import reactor.bus.EventBus;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -39,44 +37,40 @@ public class MatchService {
 
     public void updateResult(MatchId matchId, Result result) {
         Match match = matchRepository.findById(matchId);
-        updateResult(match, result);
-    }
-
-    public void updateResult(Match match, Result result) {
-        if(!result.isValid()) {
+        if (!result.isValid()) {
             throw new InvalidResultException();
         }
         match.updateResult(result);
-
-        eventBus.notify(TTTEvent.class, Event.wrap(new ResultUpdatedEvent(match.getId())));
+        eventBus.notify(ResultUpdatedEvent.class, Event.wrap(new ResultUpdatedEvent(match.getId())));
     }
 
-    public void updateState(MatchId matchId, Match.State state) {
+    public void finish(MatchId matchId) {
         Match match = matchRepository.findById(matchId);
-        updateState(match, state);
+        Match finishedMatch = match.finish();
+        matchRepository.save(finishedMatch);
+        eventBus.notify(MatchFinishedEvent.class, Event.wrap(new MatchFinishedEvent(match.getId())));
     }
 
-    public void updateState(Match match, Match.State state) {
-        if(state == Match.State.STARTED) {
-            validateStarted(match);
-        }
-        match.setState(state);
-        matchRepository.save(match);
-        eventBus.notify(TTTEvent.class, Event.wrap(new MatchStateChangedEvent(match.getId(), match.getState())));
+    public void start(MatchId matchId) {
+        Match match = matchRepository.findById(matchId);
+        assertNoOtherGameAlreadyStarted(match.getId());
+        Match startedMatch = match.start();
+        matchRepository.save(startedMatch);
+        eventBus.notify(MatchStartedEvent.class, Event.wrap(new MatchStartedEvent(match.getId())));
     }
 
     /**
      * @throws IllegalStateException in case of any invalid result
      */
-    private void validateStarted(Match match) {
-        Table table = tableRepository.findTable(match.getId());
-        List<Match> otherTableMatches = table.getMatches().stream()
-                .filter(matchId -> matchId != match.getId())
+    private void assertNoOtherGameAlreadyStarted(MatchId matchId) {
+        Table table = tableRepository.findTable(matchId);
+        boolean otherMatchAlreadyStarted = table.getMatches().stream()
+                .filter(id -> id != matchId)
                 .map(matchRepository::findById)
-                .collect(Collectors.toList());
+                .anyMatch(Match::isStarted);
 
-        if (otherTableMatches.stream().anyMatch(m -> m.getState() == Match.State.STARTED)) {
-            throw new IllegalStateException("Another match already started on selected table");
+        if (otherMatchAlreadyStarted) {
+            throw new IllegalStateException("Another Match already started on selected table");
         }
     }
 }
