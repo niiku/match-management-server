@@ -8,5 +8,5 @@ public class Player {
     private final String firstName;
     private final String lastName;
     private final Club club;
-
+    private final CallCount callCount;
 }
