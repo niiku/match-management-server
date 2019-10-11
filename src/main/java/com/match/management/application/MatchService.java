@@ -32,7 +32,8 @@ public class MatchService {
         });
         matchRepository.save(match);
 
-        CallForMissingPlayerRequestedEvent event = new CallForMissingPlayerRequestedEvent(tableRepository.findTable(match.getId()).getId(), match);
+        Table table = tableRepository.findTable(match.getId());
+        CallForMissingPlayerRequestedEvent event = new CallForMissingPlayerRequestedEvent(table.getId(), match);
         eventBus.notify(TTTEvent.class, Event.wrap(event));
     }
 

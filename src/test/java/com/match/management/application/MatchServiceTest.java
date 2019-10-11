@@ -16,13 +16,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Collections;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -142,6 +140,7 @@ public class MatchServiceTest {
                 .build();
 
         List<PlayerId> playerIds = Collections.singletonList(playerAId);
+        when(tableRepositoryMock.findTable(match.getId())).thenReturn(Table.builder().build());
 
         matchService.callPlayers(match, playerIds);
 
@@ -159,6 +158,7 @@ public class MatchServiceTest {
                 .build();
 
         List<PlayerId> playerIds = Collections.singletonList(playerBId);
+        when(tableRepositoryMock.findTable(match.getId())).thenReturn(Table.builder().build());
 
         matchService.callPlayers(match, playerIds);
 
@@ -177,6 +177,7 @@ public class MatchServiceTest {
                 .build();
 
         List<PlayerId> playerIds = Arrays.asList(playerAId, playerBId);
+        when(tableRepositoryMock.findTable(match.getId())).thenReturn(Table.builder().build());
 
         matchService.callPlayers(match, playerIds);
 
@@ -199,6 +200,7 @@ public class MatchServiceTest {
                 .build();
 
         List<PlayerId> playerIds = Arrays.asList(playerAId, playerBId);
+        when(tableRepositoryMock.findTable(match.getId())).thenReturn(Table.builder().build());
 
         matchService.callPlayers(match, playerIds);
         matchService.callPlayers(match, playerIds);
