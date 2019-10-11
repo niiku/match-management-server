@@ -2,10 +2,13 @@ package com.match.management.infrastructure.web;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.match.management.domain.match.CallCount;
 import com.match.management.domain.match.Club;
 import com.match.management.domain.match.Player;
 import com.match.management.domain.match.PlayerId;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -31,11 +34,11 @@ public class PlayerDTO {
         if (player == null) {
             return null;
         }
-        return new Player(
-                new PlayerId(player.getPlayerId()),
-                player.getFirstName(),
-                player.getLastName(),
-                new Club(player.getClub())
-        );
+        return Player.builder()
+                .id(new PlayerId(player.getPlayerId()))
+                .firstName(player.getFirstName())
+                .lastName(player.getLastName())
+                .club(new Club(player.getClub()))
+                .build();
     }
 }

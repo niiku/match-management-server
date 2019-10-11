@@ -12,9 +12,14 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import reactor.bus.EventBus;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -116,5 +121,79 @@ public class MatchServiceTest {
         matchService.updateState(match, Match.State.STARTED);
     }
 
+    @Test
+    public void callPlayersA_happyflow() {
+        PlayerId playerAId = new PlayerId(1);
+        Match match = Match.builder().id(new MatchId(1))
+                .playerA(Player.builder().id(playerAId).build())
+                .playerB(Player.builder().id(new PlayerId(2)).build())
+                .build();
 
+        List<PlayerId> playerIds = Collections.singletonList(playerAId);
+
+        matchService.callPlayers(match, playerIds);
+
+        assertNotNull(match.getPlayerA().getCallCount().getTimeOfLastCall());
+        assertNull(match.getPlayerB().getCallCount());
+        assertThat(match.getPlayerA().getCallCount().getValue(), is(1));
+    }
+
+    @Test
+    public void callPlayersB_happyflow() {
+        PlayerId playerBId = new PlayerId(2);
+        Match match = Match.builder().id(new MatchId(1))
+                .playerA(Player.builder().id(new PlayerId(1)).build())
+                .playerB(Player.builder().id(playerBId).build())
+                .build();
+
+        List<PlayerId> playerIds = Collections.singletonList(playerBId);
+
+        matchService.callPlayers(match, playerIds);
+
+        assertNotNull(match.getPlayerB().getCallCount().getTimeOfLastCall());
+        assertNull(match.getPlayerA().getCallCount());
+        assertThat(match.getPlayerB().getCallCount().getValue(), is(1));
+    }
+
+    @Test
+    public void callAllPlayers_happyflow() {
+        PlayerId playerAId = new PlayerId(1);
+        PlayerId playerBId = new PlayerId(2);
+        Match match = Match.builder().id(new MatchId(1))
+                .playerA(Player.builder().id(playerAId).build())
+                .playerB(Player.builder().id(playerBId).build())
+                .build();
+
+        List<PlayerId> playerIds = Arrays.asList(playerAId, playerBId);
+
+        matchService.callPlayers(match, playerIds);
+
+        assertNotNull(match.getPlayerA().getCallCount().getTimeOfLastCall());
+        assertThat(match.getPlayerA().getCallCount().getValue(), is(1));
+        assertNotNull(match.getPlayerB().getCallCount().getTimeOfLastCall());
+        assertThat(match.getPlayerB().getCallCount().getValue(), is(1));
+    }
+
+    @Test
+    public void callTwiceAllPlayers_happyflow() {
+        PlayerId playerAId = new PlayerId(1);
+        PlayerId playerBId = new PlayerId(2);
+        Match match = Match.builder().id(new MatchId(1))
+                .playerA(Player.builder().id(playerAId).build())
+                .playerB(Player.builder()
+                        .id(playerBId)
+                        .callCount(new CallCount(1, LocalDateTime.now()))
+                        .build())
+                .build();
+
+        List<PlayerId> playerIds = Arrays.asList(playerAId, playerBId);
+
+        matchService.callPlayers(match, playerIds);
+        matchService.callPlayers(match, playerIds);
+
+        assertNotNull(match.getPlayerA().getCallCount().getTimeOfLastCall());
+        assertThat(match.getPlayerA().getCallCount().getValue(), is(2));
+        assertNotNull(match.getPlayerB().getCallCount().getTimeOfLastCall());
+        assertThat(match.getPlayerB().getCallCount().getValue(), is(3));
+    }
 }

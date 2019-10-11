@@ -4,6 +4,8 @@ import com.match.management.domain.ddd.Aggregate;
 import com.match.management.domain.ddd.AggregateId;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Aggregate
 @Builder
@@ -43,6 +45,18 @@ public class Match {
                     this.state = state;
             }
         }
+    }
+
+    public void incrementPlayerACallCount() {
+        this.playerA = this.playerA.toBuilder().callCount(incrementCallCount(playerA.getCallCount())).build();
+    }
+
+    public void incrementPlayerBCallCount() {
+        this.playerB = this.playerB.toBuilder().callCount(incrementCallCount(playerB.getCallCount())).build();
+    }
+
+    private CallCount incrementCallCount(CallCount cca) {
+        return new CallCount(cca == null ? 1 : cca.getValue() + 1, LocalDateTime.now());
     }
 
     /**

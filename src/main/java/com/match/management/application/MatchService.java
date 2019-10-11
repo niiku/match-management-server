@@ -3,14 +3,10 @@ package com.match.management.application;
 import com.match.management.domain.MatchStateChangedEvent;
 import com.match.management.domain.ResultUpdatedEvent;
 import com.match.management.domain.TTTEvent;
-import com.match.management.domain.match.Match;
-import com.match.management.domain.match.MatchId;
-import com.match.management.domain.match.MatchRepository;
-import com.match.management.domain.match.Result;
+import com.match.management.domain.match.*;
 import com.match.management.domain.table.Table;
 import com.match.management.domain.table.TableRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.message.StringFormattedMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.bus.Event;
@@ -28,6 +24,18 @@ public class MatchService {
     private final TableRepository tableRepository;
 
     private final EventBus eventBus;
+
+    public void callPlayers(Match match, List<PlayerId> playerIds) {
+        playerIds.forEach(id -> {
+            if(match.getPlayerA().getId().equals(id)) {
+                match.incrementPlayerACallCount();
+            } else if(match.getPlayerB().getId().equals(id)) {
+                match.incrementPlayerBCallCount();
+            }
+        });
+        matchRepository.save(match);
+        // eventBus.notify(TTTEvent.class, Event.wrap(new MatchStateChangedEvent(match.getId(), match.getState())));
+    }
 
     public void updateResult(MatchId matchId, Result result) {
         Match match = matchRepository.findById(matchId);
