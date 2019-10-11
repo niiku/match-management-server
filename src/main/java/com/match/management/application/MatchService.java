@@ -11,7 +11,6 @@ import reactor.bus.Event;
 import reactor.bus.EventBus;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -32,7 +31,9 @@ public class MatchService {
             }
         });
         matchRepository.save(match);
-        // eventBus.notify(TTTEvent.class, Event.wrap(new MatchStateChangedEvent(match.getId(), match.getState())));
+
+        CallForMissingPlayerRequestedEvent event = new CallForMissingPlayerRequestedEvent(tableRepository.findTable(match.getId()).getId(), match);
+        eventBus.notify(TTTEvent.class, Event.wrap(event));
     }
 
     public void updateResult(MatchId matchId, Result result) {
