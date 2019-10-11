@@ -58,4 +58,11 @@ public class Match {
     public boolean isStarted() {
         return this.state == State.STARTED;
     }
+
+    public Match playerAWonByDefault(){
+        Result wonByDefaultResult = Result.wonByDefaultPlayerA();
+        updateResult(wonByDefaultResult);
+        return finish();
+    }
+
 }

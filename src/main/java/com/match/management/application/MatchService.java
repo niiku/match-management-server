@@ -75,4 +75,11 @@ public class MatchService {
             throw new IllegalStateException("Another Match already started on selected table");
         }
     }
+
+    public void playerAWonByDefault(MatchId matchId) {
+        Match match = matchRepository.findById(matchId);
+        Match wonByDefaultMatch = match.playerAWonByDefault();
+        matchRepository.save(wonByDefaultMatch);
+        eventBus.notify(MatchFinishedEvent.class, Event.wrap(new MatchFinishedEvent(matchId)));
+    }
 }

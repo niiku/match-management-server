@@ -2,11 +2,7 @@ package com.match.management.server;
 
 import com.match.management.application.MatchService;
 import com.match.management.domain.MatchFinishedEvent;
-import com.match.management.domain.TTTEvent;
-import com.match.management.domain.match.GameResult;
-import com.match.management.domain.match.Match;
-import com.match.management.domain.match.MatchRepository;
-import com.match.management.domain.match.Result;
+import com.match.management.domain.match.*;
 import com.match.management.domain.table.Table;
 import com.match.management.domain.table.TableId;
 import com.match.management.domain.table.TableRepository;
@@ -25,9 +21,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static reactor.bus.selector.Selectors.$;
 
@@ -77,6 +73,25 @@ public class MatchFinishingTest {
 
     @Test
     public void matchFinished_playerBWonByDefault_matchIsWonByDefaultByPlayerB() {
-//        matchService.finish(currentMatchId);
+        List<Event> catchEvents = new ArrayList<>();
+        eventBus.on($(MatchFinishedEvent.class), catchEvents::add);
+        MatchId currentMatchId = new MatchId(10);
+
+        matchService.playerAWonByDefault(currentMatchId);
+
+        await().atMost(5, TimeUnit.SECONDS).until(() -> !catchEvents.isEmpty());
+        assertThat(catchEvents).hasSize(1);
+        Match updatedMatch = matchRepository.findById(currentMatchId);
+        assertThat(updatedMatch.getResult()).isEqualTo(new Result(
+                Arrays.asList(
+                        new GameResult(11, 0),
+                        new GameResult(11, 0),
+                        new GameResult(11, 0))));
+    }
+
+    private boolean assertRightResult(List<Event> catchEvents) {
+        assertTrue(!catchEvents.isEmpty());
+
+        return !catchEvents.isEmpty();
     }
 }

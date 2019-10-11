@@ -3,12 +3,20 @@ package com.match.management.domain.match;
 import lombok.Value;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Value
 public final class Result {
     private final List<GameResult> games;
 
+    public static Result wonByDefaultPlayerA() {
+        return new Result(
+                Arrays.asList(
+                        new GameResult(11, 0),
+                        new GameResult(11, 0),
+                        new GameResult(11, 0)));
+    }
 
 
     public int getGamesWonPlayerA() {
