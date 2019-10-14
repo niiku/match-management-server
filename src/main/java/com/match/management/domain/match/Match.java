@@ -43,11 +43,11 @@ public class Match {
         return this;
     }
 
-    public void incrementPlayerACallCount() {
+    public void callPlayerA() {
         this.playerA = this.playerA.toBuilder().callCount(incrementCallCount(playerA.getCallCount())).build();
     }
 
-    public void incrementPlayerBCallCount() {
+    public void callPlayerB() {
         this.playerB = this.playerB.toBuilder().callCount(incrementCallCount(playerB.getCallCount())).build();
     }
 

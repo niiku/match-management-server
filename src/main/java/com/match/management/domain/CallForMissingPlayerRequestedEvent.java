@@ -11,5 +11,4 @@ public class CallForMissingPlayerRequestedEvent implements TTTEvent {
 
     private TableId tableId;
     private Match match;
-
 }

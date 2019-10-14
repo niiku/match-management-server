@@ -23,18 +23,24 @@ public class MatchService {
     private final EventBus eventBus;
 
     public void callPlayers(Match match, List<PlayerId> playerIds) {
-        playerIds.forEach(id -> {
-            if(match.getPlayerA().getId().equals(id)) {
-                match.incrementPlayerACallCount();
-            } else if(match.getPlayerB().getId().equals(id)) {
-                match.incrementPlayerBCallCount();
-            }
-        });
+        callPlayersOnMatch(match, playerIds);
         matchRepository.save(match);
 
         Table table = tableRepository.findTable(match.getId());
         CallForMissingPlayerRequestedEvent event = new CallForMissingPlayerRequestedEvent(table.getId(), match);
         eventBus.notify(TTTEvent.class, Event.wrap(event));
+    }
+
+    private void callPlayersOnMatch(Match match, List<PlayerId> playerIds) {
+        playerIds.forEach(id -> {
+            if(match.getPlayerA().getId().equals(id)) {
+                match.callPlayerA();
+                return;
+            }
+            if(match.getPlayerB().getId().equals(id)) {
+                match.callPlayerB();
+            }
+        });
     }
 
     public void updateResult(MatchId matchId, Result result) {
