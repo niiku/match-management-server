@@ -2,13 +2,19 @@ package com.match.management.domain.match;
 
 import com.match.management.domain.ddd.Aggregate;
 import com.match.management.domain.ddd.AggregateId;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+
+import java.util.List;
 
 @Getter
 @Aggregate
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Match {
+
 
     public enum State {
         ASSIGNED,
@@ -42,23 +48,23 @@ public class Match {
     }
 
     public void callPlayerA() {
-        this.playerA = this.playerA.increaseCallCount();
+        this.playerA.missing();
     }
 
     public void callPlayerB() {
-        this.playerB = this.playerB.increaseCallCount();
+        this.playerB.missing();
     }
 
     public boolean isStarted() {
         return this.state == State.STARTED;
     }
 
-    public Match playerAWonByDefault(){
+    public Match playerAHasWonByDefault(){
         Result wonByDefaultResult = Result.wonByDefaultByPlayerA();
         return setResultAndFinishMatch(wonByDefaultResult);
     }
 
-    public Match playerBWonByDefault() {
+    public Match playerBHasWonByDefault() {
         Result wonByDefaultResult = Result.wonByDefaultByPlayerB();
         return setResultAndFinishMatch(wonByDefaultResult);
     }
@@ -66,6 +72,16 @@ public class Match {
     private Match setResultAndFinishMatch(Result wonByDefaultResult) {
         updateResult(wonByDefaultResult);
         return finish();
+    }
+
+    public Match callPlayers(List<PlayerId> playerIds) {
+        if(playerIds.contains(playerA.getId())){
+            callPlayerA();
+        }
+        if(playerIds.contains(playerB.getId())){
+            callPlayerB();
+        }
+        return this;
     }
 
 }

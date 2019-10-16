@@ -1,11 +1,11 @@
 package com.match.management.server;
 
 import com.match.management.domain.CallForMissingPlayerRequestedEvent;
-import com.match.management.domain.TTTEvent;
 import com.match.management.domain.match.Match;
 import com.match.management.domain.match.MatchId;
 import com.match.management.domain.match.MatchRepository;
 import com.match.management.domain.match.Player;
+import com.match.management.domain.table.TableId;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,13 +44,10 @@ public class ApiPlayerCallsResourceTest {
     @Test
     public void playercall_playerA_playerAHasTwoCalls() throws Exception {
         List<Event> catchEvents = new ArrayList<>();
-        eventBus.on($(TTTEvent.class), event -> {
-            if(event.getData() instanceof CallForMissingPlayerRequestedEvent) {
-                catchEvents.add(event);
-            }
-        });
+        eventBus.on($(CallForMissingPlayerRequestedEvent.class), catchEvents::add);
 
-        Match match = matchRepository.findById(new MatchId(100));
+        MatchId matchId = new MatchId(100);
+        Match match = matchRepository.findById(matchId);
         Player playerA = match.getPlayerA();
 
         mvc.perform(post("/playercall/" + match.getId().getValue())
@@ -58,13 +55,14 @@ public class ApiPlayerCallsResourceTest {
                 .content("{\"player_ids\":["+ playerA.getId().getValue() +"]}"))
                 .andExpect(status().isOk());
 
-        match = matchRepository.findById(new MatchId(100));
+        match = matchRepository.findById(matchId);
         assertThat(match.getPlayerA().getCallCount().getValue())
                 .isEqualTo(2);
         assertThat(match.getPlayerB().getCallCount().getValue())
                 .isEqualTo(1);
         await().atMost(5, TimeUnit.SECONDS).until(() -> !catchEvents.isEmpty());
-        assertThat(catchEvents.get(0).getData()).isInstanceOf(CallForMissingPlayerRequestedEvent.class);
+        assertThat(catchEvents).first().extracting(event -> event.getData()).isEqualTo(
+                new CallForMissingPlayerRequestedEvent(new TableId("10"), match));
     }
 
 }

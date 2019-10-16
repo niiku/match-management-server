@@ -1,6 +1,9 @@
 package com.match.management.application;
 
-import com.match.management.domain.*;
+import com.match.management.domain.CallForMissingPlayerRequestedEvent;
+import com.match.management.domain.MatchFinishedEvent;
+import com.match.management.domain.MatchStartedEvent;
+import com.match.management.domain.ResultUpdatedEvent;
 import com.match.management.domain.match.*;
 import com.match.management.domain.table.Table;
 import com.match.management.domain.table.TableRepository;
@@ -11,8 +14,6 @@ import reactor.bus.Event;
 import reactor.bus.EventBus;
 
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -25,25 +26,12 @@ public class MatchService {
     private final EventBus eventBus;
 
     public void callPlayers(Match match, List<PlayerId> playerIds) {
-        Match calledMatch = callPlayersOnMatch(match, playerIds);
+        Match calledMatch =  match.callPlayers(playerIds);
         matchRepository.save(calledMatch);
 
         Table table = tableRepository.findTable(match.getId());
         CallForMissingPlayerRequestedEvent event = new CallForMissingPlayerRequestedEvent(table.getId(), match);
-        eventBus.notify(TTTEvent.class, Event.wrap(event));
-    }
-
-    private Match callPlayersOnMatch(Match match, List<PlayerId> playerIds) {
-        playerIds.forEach(id -> {
-            if(match.getPlayerA().getId().equals(id)) {
-                match.callPlayerA();
-                return;
-            }
-            if(match.getPlayerB().getId().equals(id)) {
-                match.callPlayerB();
-            }
-        });
-        return match;
+        eventBus.notify(CallForMissingPlayerRequestedEvent.class, Event.wrap(event));
     }
 
     public void updateResult(MatchId matchId, Result result) {
@@ -86,18 +74,17 @@ public class MatchService {
     }
 
     public void playerAWonByDefault(MatchId matchId) {
-        playerWonByDefault(matchId, match -> match.playerAWonByDefault());
+        Match match = matchRepository.findById(matchId);
+        Match wonByDefaultMatch = match.playerAHasWonByDefault();
+        matchRepository.save(wonByDefaultMatch);
+        eventBus.notify(MatchFinishedEvent.class, Event.wrap(new MatchFinishedEvent(matchId)));
     }
 
     public void playerBWonByDefault(MatchId currentMatchId) {
-        playerWonByDefault(currentMatchId, match -> match.playerBWonByDefault());
-    }
-
-    private void playerWonByDefault(MatchId matchId, Function<Match, Match> playerToWon) {
-        Match match = matchRepository.findById(matchId);
-        Match wonByDefaultMatch = playerToWon.apply(match);
+        Match match = matchRepository.findById(currentMatchId);
+        Match wonByDefaultMatch = match.playerBHasWonByDefault();
         matchRepository.save(wonByDefaultMatch);
-        eventBus.notify(MatchFinishedEvent.class, Event.wrap(new MatchFinishedEvent(matchId)));
+        eventBus.notify(MatchFinishedEvent.class, Event.wrap(new MatchFinishedEvent(currentMatchId)));
     }
 
 

@@ -1,6 +1,6 @@
 package com.match.management.domain.match;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -8,18 +8,25 @@ import java.time.LocalDateTime;
 
 
 @Data
-@Builder(toBuilder = true)
+@AllArgsConstructor
 public class Player {
     @NonNull
     private final PlayerId id;
     private final String firstName;
     private final String lastName;
     private final Club club;
-    @Builder.Default
-    private final CallCount callCount = new CallCount(1, LocalDateTime.now());
 
-    public Player increaseCallCount() {
-        return this.toBuilder().callCount(callCount.increaseCallCount()).build();
+    private CallCount callCount = new CallCount(1, LocalDateTime.now());
+
+    public Player(@NonNull PlayerId id, String firstName, String lastName, Club club) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.club = club;
+    }
+
+    public void missing() {
+        this.callCount = callCount.increaseCallCount();
     }
 
 

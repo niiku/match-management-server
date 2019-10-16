@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import reactor.bus.EventBus;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,7 +19,8 @@ import java.util.List;
 
 import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -134,11 +134,7 @@ public class MatchServiceTest {
     @Test
     public void callPlayersA_happyflow() {
         PlayerId playerAId = new PlayerId(1);
-        Match match = Match.builder().id(new MatchId(1))
-                .playerA(Player.builder().id(playerAId).build())
-                .playerB(Player.builder().id(new PlayerId(2)).build())
-                .build();
-
+        Match match = createMatchWithExamplePlayers(playerAId, new PlayerId(2));
         List<PlayerId> playerIds = Collections.singletonList(playerAId);
         when(tableRepositoryMock.findTable(match.getId())).thenReturn(Table.builder().build());
 
@@ -152,10 +148,7 @@ public class MatchServiceTest {
     @Test
     public void callPlayersB_happyflow() {
         PlayerId playerBId = new PlayerId(2);
-        Match match = Match.builder().id(new MatchId(1))
-                .playerA(Player.builder().id(new PlayerId(1)).build())
-                .playerB(Player.builder().id(playerBId).build())
-                .build();
+        Match match = createMatchWithExamplePlayers(new PlayerId(1), playerBId);
 
         List<PlayerId> playerIds = Collections.singletonList(playerBId);
         when(tableRepositoryMock.findTable(match.getId())).thenReturn(Table.builder().build());
@@ -171,10 +164,7 @@ public class MatchServiceTest {
     public void callAllPlayers_happyflow() {
         PlayerId playerAId = new PlayerId(1);
         PlayerId playerBId = new PlayerId(2);
-        Match match = Match.builder().id(new MatchId(1))
-                .playerA(Player.builder().id(new PlayerId(1)).build())
-                .playerB(Player.builder().id(playerBId).build())
-                .build();
+        Match match = createMatchWithExamplePlayers(playerAId, playerBId);
 
         List<PlayerId> playerIds = Arrays.asList(playerAId, playerBId);
         when(tableRepositoryMock.findTable(match.getId())).thenReturn(Table.builder().build());
@@ -191,16 +181,7 @@ public class MatchServiceTest {
     public void callTwiceAllPlayers_happyflow() {
         PlayerId playerAId = new PlayerId(1);
         PlayerId playerBId = new PlayerId(2);
-        Match match = Match.builder().id(new MatchId(1))
-                .playerA(Player.builder()
-                        .id(playerAId)
-                        .callCount(new CallCount(1, LocalDateTime.now()))
-                        .build())
-                .playerB(Player.builder()
-                        .id(playerBId)
-                        .callCount(new CallCount(1, LocalDateTime.now()))
-                        .build())
-                .build();
+        Match match = createMatchWithExamplePlayers(playerAId, playerBId);
 
         List<PlayerId> playerIds = Arrays.asList(playerAId, playerBId);
         when(tableRepositoryMock.findTable(match.getId())).thenReturn(Table.builder().build());
@@ -212,5 +193,14 @@ public class MatchServiceTest {
         assertThat(match.getPlayerA().getCallCount().getValue(), is(3));
         assertNotNull(match.getPlayerB().getCallCount().getTimeOfLastCall());
         assertThat(match.getPlayerB().getCallCount().getValue(), is(3));
+    }
+
+    private Match createMatchWithExamplePlayers(PlayerId playerAId, PlayerId playerBId) {
+        Player playerA = new Player(playerAId, "Horst", "Schlämmer", new Club("Musterhausen"));
+        Player playerB = new Player(playerBId, "Horst", "Schlämmer", new Club("Musterhausen"));
+        return Match.builder().id(new MatchId(1))
+                .playerA(playerA)
+                .playerB(playerB)
+                .build();
     }
 }
