@@ -8,4 +8,8 @@ import java.time.LocalDateTime;
 public class CallCount {
     private final int value;
     private final LocalDateTime timeOfLastCall;
+
+    public CallCount increaseCallCount() {
+        return new CallCount(this.getValue() + 1, LocalDateTime.now());
+    }
 }

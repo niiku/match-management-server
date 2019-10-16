@@ -4,8 +4,6 @@ import com.match.management.domain.ddd.Aggregate;
 import com.match.management.domain.ddd.AggregateId;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Aggregate
 @Builder
@@ -44,15 +42,11 @@ public class Match {
     }
 
     public void callPlayerA() {
-        this.playerA = this.playerA.toBuilder().callCount(incrementCallCount(playerA.getCallCount())).build();
+        this.playerA = this.playerA.increaseCallCount();
     }
 
     public void callPlayerB() {
-        this.playerB = this.playerB.toBuilder().callCount(incrementCallCount(playerB.getCallCount())).build();
-    }
-
-    private CallCount incrementCallCount(CallCount cca) {
-        return new CallCount(cca == null ? 1 : cca.getValue() + 1, LocalDateTime.now());
+        this.playerB = this.playerB.increaseCallCount();
     }
 
     public boolean isStarted() {
@@ -60,7 +54,16 @@ public class Match {
     }
 
     public Match playerAWonByDefault(){
-        Result wonByDefaultResult = Result.wonByDefaultPlayerA();
+        Result wonByDefaultResult = Result.wonByDefaultByPlayerA();
+        return setResultAndFinishMatch(wonByDefaultResult);
+    }
+
+    public Match playerBWonByDefault() {
+        Result wonByDefaultResult = Result.wonByDefaultByPlayerB();
+        return setResultAndFinishMatch(wonByDefaultResult);
+    }
+
+    private Match setResultAndFinishMatch(Result wonByDefaultResult) {
         updateResult(wonByDefaultResult);
         return finish();
     }

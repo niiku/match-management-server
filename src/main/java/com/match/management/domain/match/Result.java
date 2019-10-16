@@ -10,12 +10,21 @@ import java.util.List;
 public final class Result {
     private final List<GameResult> games;
 
-    public static Result wonByDefaultPlayerA() {
+    public static Result wonByDefaultByPlayerA() {
         return new Result(
                 Arrays.asList(
                         new GameResult(11, 0),
                         new GameResult(11, 0),
                         new GameResult(11, 0)));
+    }
+
+    public static Result wonByDefaultByPlayerB() {
+        return new Result(
+                Arrays.asList(
+                        new GameResult(0, 11),
+                        new GameResult(0, 11),
+                        new GameResult(0, 11))
+        );
     }
 
 

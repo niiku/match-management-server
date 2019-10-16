@@ -42,7 +42,7 @@ public class ApiPlayerCallsResourceTest {
     private EventBus eventBus;
 
     @Test
-    public void updateResult_happy_flow() throws Exception {
+    public void playercall_playerA_playerAHasTwoCalls() throws Exception {
         List<Event> catchEvents = new ArrayList<>();
         eventBus.on($(TTTEvent.class), event -> {
             if(event.getData() instanceof CallForMissingPlayerRequestedEvent) {
@@ -50,15 +50,18 @@ public class ApiPlayerCallsResourceTest {
             }
         });
 
-        Match match = matchRepository.findById(new MatchId(15));
+        Match match = matchRepository.findById(new MatchId(100));
         Player playerA = match.getPlayerA();
+
         mvc.perform(post("/playercall/" + match.getId().getValue())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"player_ids\":["+ playerA.getId().getValue() +"]}"))
                 .andExpect(status().isOk());
 
-        match = matchRepository.findById(new MatchId(15));
+        match = matchRepository.findById(new MatchId(100));
         assertThat(match.getPlayerA().getCallCount().getValue())
+                .isEqualTo(2);
+        assertThat(match.getPlayerB().getCallCount().getValue())
                 .isEqualTo(1);
         await().atMost(5, TimeUnit.SECONDS).until(() -> !catchEvents.isEmpty());
         assertThat(catchEvents.get(0).getData()).isInstanceOf(CallForMissingPlayerRequestedEvent.class);

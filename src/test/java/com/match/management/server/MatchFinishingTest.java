@@ -89,9 +89,23 @@ public class MatchFinishingTest {
                         new GameResult(11, 0))));
     }
 
-    private boolean assertRightResult(List<Event> catchEvents) {
-        assertTrue(!catchEvents.isEmpty());
+    @Test
+    public void matchFinished_playerAWonByDefault_matchIsWonByDefaultByPlayerA() {
+        List<Event> catchEvents = new ArrayList<>();
+        eventBus.on($(MatchFinishedEvent.class), catchEvents::add);
+        MatchId currentMatchId = new MatchId(15);
 
-        return !catchEvents.isEmpty();
+        matchService.playerBWonByDefault(currentMatchId);
+
+        await().atMost(5, TimeUnit.SECONDS).until(() -> !catchEvents.isEmpty());
+        assertThat(catchEvents).hasSize(1);
+        Match updatedMatch = matchRepository.findById(currentMatchId);
+        assertThat(updatedMatch.getResult()).isEqualTo(new Result(
+                Arrays.asList(
+                        new GameResult(0, 11),
+                        new GameResult(0, 11),
+                        new GameResult(0, 11)
+                )));
     }
+
 }

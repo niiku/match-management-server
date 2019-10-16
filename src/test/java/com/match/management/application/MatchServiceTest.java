@@ -145,8 +145,8 @@ public class MatchServiceTest {
         matchService.callPlayers(match, playerIds);
 
         assertNotNull(match.getPlayerA().getCallCount().getTimeOfLastCall());
-        assertNull(match.getPlayerB().getCallCount());
-        assertThat(match.getPlayerA().getCallCount().getValue(), is(1));
+        assertThat(match.getPlayerB().getCallCount().getValue(), is(1));
+        assertThat(match.getPlayerA().getCallCount().getValue(), is(2));
     }
 
     @Test
@@ -163,8 +163,8 @@ public class MatchServiceTest {
         matchService.callPlayers(match, playerIds);
 
         assertNotNull(match.getPlayerB().getCallCount().getTimeOfLastCall());
-        assertNull(match.getPlayerA().getCallCount());
-        assertThat(match.getPlayerB().getCallCount().getValue(), is(1));
+        assertThat(match.getPlayerA().getCallCount().getValue(), is(1));
+        assertThat(match.getPlayerB().getCallCount().getValue(), is(2));
     }
 
     @Test
@@ -172,7 +172,7 @@ public class MatchServiceTest {
         PlayerId playerAId = new PlayerId(1);
         PlayerId playerBId = new PlayerId(2);
         Match match = Match.builder().id(new MatchId(1))
-                .playerA(Player.builder().id(playerAId).build())
+                .playerA(Player.builder().id(new PlayerId(1)).build())
                 .playerB(Player.builder().id(playerBId).build())
                 .build();
 
@@ -182,9 +182,9 @@ public class MatchServiceTest {
         matchService.callPlayers(match, playerIds);
 
         assertNotNull(match.getPlayerA().getCallCount().getTimeOfLastCall());
-        assertThat(match.getPlayerA().getCallCount().getValue(), is(1));
+        assertThat(match.getPlayerA().getCallCount().getValue(), is(2));
         assertNotNull(match.getPlayerB().getCallCount().getTimeOfLastCall());
-        assertThat(match.getPlayerB().getCallCount().getValue(), is(1));
+        assertThat(match.getPlayerB().getCallCount().getValue(), is(2));
     }
 
     @Test
@@ -192,7 +192,10 @@ public class MatchServiceTest {
         PlayerId playerAId = new PlayerId(1);
         PlayerId playerBId = new PlayerId(2);
         Match match = Match.builder().id(new MatchId(1))
-                .playerA(Player.builder().id(playerAId).build())
+                .playerA(Player.builder()
+                        .id(playerAId)
+                        .callCount(new CallCount(1, LocalDateTime.now()))
+                        .build())
                 .playerB(Player.builder()
                         .id(playerBId)
                         .callCount(new CallCount(1, LocalDateTime.now()))
@@ -206,7 +209,7 @@ public class MatchServiceTest {
         matchService.callPlayers(match, playerIds);
 
         assertNotNull(match.getPlayerA().getCallCount().getTimeOfLastCall());
-        assertThat(match.getPlayerA().getCallCount().getValue(), is(2));
+        assertThat(match.getPlayerA().getCallCount().getValue(), is(3));
         assertNotNull(match.getPlayerB().getCallCount().getTimeOfLastCall());
         assertThat(match.getPlayerB().getCallCount().getValue(), is(3));
     }
