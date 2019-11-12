@@ -5,6 +5,9 @@
         "containerGroups_match_management_server_name": {
             "defaultValue": "match-management-server",
             "type": "String"
+        },
+        "dockerPassword": {
+            "type": "String"
         }
     },
     "variables": {},
@@ -39,7 +42,8 @@
                 "imageRegistryCredentials": [
                     {
                         "server": "baldocker.azurecr.io",
-                        "username": "baldocker"
+                        "username": "baldocker",
+                        "password": "[parameters('dockerPassword')]"
                     }
                 ],
                 "restartPolicy": "OnFailure",
