@@ -10,6 +10,8 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- script: chmod +x mvnw
+  displayName: 'Add permissions'
 - script: ./mvnw clean install -B
   displayName: 'Run maven install'
 
